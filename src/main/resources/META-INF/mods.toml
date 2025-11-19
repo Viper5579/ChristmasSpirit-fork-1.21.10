@@ -1,11 +1,11 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="[52,)"
 license="GNU General Public License v3.0"
 
 [[mods]]
     modId="cspirit"
     namespace="cspirit"
-    version="1.0.14"
+    version="1.0.15"
     displayName="Christmas Spirit"
     authors="Calemi, Kryto627, CaptainKray, Jared"
     description='''
@@ -17,6 +17,13 @@ license="GNU General Public License v3.0"
 [[dependencies.cspirit]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[52,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.cspirit]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.21,1.22)"
     ordering="NONE"
     side="BOTH"
