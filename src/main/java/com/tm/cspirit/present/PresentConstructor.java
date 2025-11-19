@@ -4,8 +4,8 @@ import com.tm.cspirit.tileentity.TileEntityPresentUnwrapped;
 import com.tm.cspirit.tileentity.TileEntityPresentWrapped;
 import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketBuffer;
 
 public class PresentConstructor {

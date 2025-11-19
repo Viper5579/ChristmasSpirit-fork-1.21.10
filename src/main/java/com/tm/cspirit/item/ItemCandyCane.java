@@ -4,17 +4,17 @@ import com.tm.cspirit.block.base.BlockItemBase;
 import com.tm.cspirit.item.base.IItemSpiritSupplier;
 import com.tm.cspirit.main.ChristmasSpirit;
 import com.tm.cspirit.util.helper.EffectHelper;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.item.Food;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.ITextComponent;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 

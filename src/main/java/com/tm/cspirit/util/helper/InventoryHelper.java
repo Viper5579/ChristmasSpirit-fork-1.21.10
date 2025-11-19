@@ -4,8 +4,8 @@ import com.tm.cspirit.tileentity.base.CSItemHandler;
 import com.tm.cspirit.util.Location;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class InventoryHelper {
 

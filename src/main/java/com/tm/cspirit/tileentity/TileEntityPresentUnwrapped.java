@@ -5,8 +5,8 @@ import com.tm.cspirit.inventory.ContainerPresentUnwrapped;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.ITextComponent;
+import net.minecraft.network.chat.StringTextComponent;
 
 public class TileEntityPresentUnwrapped extends TileEntityInventoryBase {
 

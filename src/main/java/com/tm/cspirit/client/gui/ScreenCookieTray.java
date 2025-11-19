@@ -5,7 +5,7 @@ import com.tm.cspirit.client.gui.base.ContainerScreenBase;
 import com.tm.cspirit.inventory.ContainerPresentUnwrapped;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.ITextComponent;
 
 public class ScreenCookieTray extends ContainerScreenBase<ContainerPresentUnwrapped> {
 

@@ -5,10 +5,10 @@ import com.tm.cspirit.inventory.base.ContainerBase;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import com.tm.cspirit.util.helper.ScreenHelper;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.ITextComponent;
 
 public abstract class ContainerScreenBase<T extends ContainerBase> extends ContainerScreen<Container> {
 

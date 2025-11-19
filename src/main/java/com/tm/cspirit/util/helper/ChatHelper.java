@@ -2,12 +2,12 @@ package com.tm.cspirit.util.helper;
 
 import com.tm.cspirit.main.CSReference;
 import com.tm.cspirit.util.UnitChatMessage;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.util.Util;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 

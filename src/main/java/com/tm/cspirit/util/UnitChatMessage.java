@@ -1,9 +1,9 @@
 package com.tm.cspirit.util;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
 
 public class UnitChatMessage {
 

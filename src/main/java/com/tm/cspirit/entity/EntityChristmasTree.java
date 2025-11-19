@@ -6,82 +6,86 @@ import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.helper.EffectHelper;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.*;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraftforge.network.NetworkHooks;
 
 import java.util.List;
 
 public class EntityChristmasTree extends Entity {
 
-    private static final DataParameter<NonNullList<ItemStack>> INVENTORY = EntityDataManager.createKey(EntityChristmasTree.class, CSDataSerializers.ITEMSTACK_ARRAY_4);
-    private static final DataParameter<Boolean> WHITE = EntityDataManager.createKey(EntityChristmasTree.class, DataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<NonNullList<ItemStack>> INVENTORY = SynchedEntityData.defineId(EntityChristmasTree.class, CSDataSerializers.ITEMSTACK_ARRAY_4);
+    private static final EntityDataAccessor<Boolean> WHITE = SynchedEntityData.defineId(EntityChristmasTree.class, EntityDataSerializers.BOOLEAN);
 
-    public EntityChristmasTree(EntityType<? extends EntityChristmasTree> type, World world) {
-        super(type, world);
+    public EntityChristmasTree(EntityType<? extends EntityChristmasTree> type, Level level) {
+        super(type, level);
     }
 
-    public EntityChristmasTree(World world, Vector3d position, float yaw, boolean isWhite) {
-        this(InitEntityTypes.CHRISTMAS_TREE.get(), world);
-        setLocationAndAngles(position.x, position.y, position.z, yaw, 0);
-        dataManager.set(WHITE, isWhite);
+    public EntityChristmasTree(Level level, Vec3 position, float yaw, boolean isWhite) {
+        this(InitEntityTypes.CHRISTMAS_TREE.get(), level);
+        absMoveTo(position.x, position.y, position.z, yaw, 0);
+        entityData.set(WHITE, isWhite);
     }
 
     public boolean isWhite() {
-        return dataManager.get(WHITE);
+        return entityData.get(WHITE);
     }
 
-    public ItemStack getItemStackFromSlot(EquipmentSlotType slotIn) {
+    public ItemStack getItemBySlot(EquipmentSlot slotIn) {
 
-        if (slotIn.getSlotType() == EquipmentSlotType.Group.ARMOR) {
-            return dataManager.get(INVENTORY).get(slotIn.getIndex());
+        if (slotIn.getType() == EquipmentSlot.Type.ARMOR) {
+            return entityData.get(INVENTORY).get(slotIn.getIndex());
         }
 
         return ItemStack.EMPTY;
     }
 
     public ItemStack getItemStackFromID (int id) {
-        return getItemStackFromSlot(getSlotTypeFromID(id));
+        return getItemBySlot(getSlotTypeFromID(id));
     }
 
-    public EquipmentSlotType getSlotTypeFromID(int id) {
+    public EquipmentSlot getSlotTypeFromID(int id) {
 
         switch (id) {
-            case 0: return EquipmentSlotType.FEET;
-            case 1: return EquipmentSlotType.LEGS;
-            case 2: return EquipmentSlotType.CHEST;
+            case 0: return EquipmentSlot.FEET;
+            case 1: return EquipmentSlot.LEGS;
+            case 2: return EquipmentSlot.CHEST;
         }
 
-        return EquipmentSlotType.HEAD;
+        return EquipmentSlot.HEAD;
     }
 
-    public void setItemStackToSlot(EquipmentSlotType slotIn, ItemStack stack) {
+    public void setItemSlot(EquipmentSlot slotIn, ItemStack stack) {
 
-        if (slotIn.getSlotType() == EquipmentSlotType.Group.ARMOR) {
+        if (slotIn.getType() == EquipmentSlot.Type.ARMOR) {
 
             NonNullList<ItemStack> newInv = NonNullList.create();
-            newInv.addAll(dataManager.get(INVENTORY));
+            newInv.addAll(entityData.get(INVENTORY));
             newInv.set(slotIn.getIndex(), stack);
-            dataManager.set(INVENTORY, newInv);
+            entityData.set(INVENTORY, newInv);
         }
     }
 
     public boolean hasStar() {
-        return !getItemStackFromSlot(EquipmentSlotType.HEAD).isEmpty();
+        return !getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 
     private boolean addDecoration(ItemStack stack) {
@@ -92,14 +96,14 @@ public class EntityChristmasTree extends Entity {
         boolean added = false;
 
         if (!hasStar()) {
-            setItemStackToSlot(EquipmentSlotType.HEAD, copiedStack);
+            setItemSlot(EquipmentSlot.HEAD, copiedStack);
             return true;
         }
 
         for (int i = 0; i < 4; i++) {
 
             if (getItemStackFromID(i).isEmpty()) {
-                setItemStackToSlot(getSlotTypeFromID(i), copiedStack);
+                setItemSlot(getSlotTypeFromID(i), copiedStack);
                 added = true;
                 break;
             }
@@ -115,14 +119,14 @@ public class EntityChristmasTree extends Entity {
             ItemStack removedStack = getItemStackFromID(i);
 
             if (!removedStack.isEmpty()) {
-                setItemStackToSlot(getSlotTypeFromID(i), ItemStack.EMPTY);
+                setItemSlot(getSlotTypeFromID(i), ItemStack.EMPTY);
                 return removedStack;
             }
         }
 
         if (hasStar()) {
-            ItemStack removedStack = getItemStackFromSlot(EquipmentSlotType.HEAD);
-            setItemStackToSlot(EquipmentSlotType.HEAD, ItemStack.EMPTY);
+            ItemStack removedStack = getItemBySlot(EquipmentSlot.HEAD);
+            setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
             return removedStack;
         }
 
@@ -137,21 +141,21 @@ public class EntityChristmasTree extends Entity {
 
         int stack = 1;
 
-        if (hasStar() && !getItemStackFromSlot(EquipmentSlotType.CHEST).isEmpty() && !getItemStackFromSlot(EquipmentSlotType.LEGS).isEmpty() && !getItemStackFromSlot(EquipmentSlotType.FEET).isEmpty()) {
+        if (hasStar() && !getItemBySlot(EquipmentSlot.CHEST).isEmpty() && !getItemBySlot(EquipmentSlot.LEGS).isEmpty() && !getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
             stack = 2;
         }
 
-        List<PlayerEntity> closePlayers = world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB(getPosition().getX() - radius, getPosition().getY() - radius, getPosition().getZ() - radius, getPosition().getX() + radius, getPosition().getY() + radius, getPosition().getZ() + radius));
+        List<Player> closePlayers = level().getEntitiesOfClass(Player.class, new AABB(blockPosition().getX() - radius, blockPosition().getY() - radius, blockPosition().getZ() - radius, blockPosition().getX() + radius, blockPosition().getY() + radius, blockPosition().getZ() + radius));
 
-        for (PlayerEntity player : closePlayers) {
+        for (Player player : closePlayers) {
             EffectHelper.giveHolidaySpiritStackEffect(player, stack, 30);
         }
     }
 
     @Override
-    public ActionResultType processInitialInteract(PlayerEntity player, Hand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand) {
 
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
         if (!stack.isEmpty()) {
 
@@ -167,23 +171,23 @@ public class EntityChristmasTree extends Entity {
             ItemStack removedStack = removeDecoration();
 
             if (!removedStack.isEmpty()) {
-                ItemHelper.spawnStackAtEntity(world, player, removedStack);
+                ItemHelper.spawnStackAtEntity(level(), player, removedStack);
             }
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amount) {
+    public boolean hurt(DamageSource source, float amount) {
 
-        Location location = new Location(world, getPosition());
+        Location location = new Location(level(), blockPosition());
 
-        if (source.getImmediateSource() instanceof PlayerEntity) {
+        if (source.getDirectEntity() instanceof Player) {
 
-            PlayerEntity player = (PlayerEntity) source.getImmediateSource();
+            Player player = (Player) source.getDirectEntity();
 
-            if (player.getHeldItemMainhand().getItem() instanceof AxeItem || player.isCreative()) {
+            if (player.getMainHandItem().getItem() instanceof AxeItem || player.isCreative()) {
 
                 Item item = InitItems.CHRISTMAS_TREE.get();
 
@@ -191,19 +195,19 @@ public class EntityChristmasTree extends Entity {
                     item = InitItems.CHRISTMAS_TREE_WHITE.get();
                 }
 
-                ItemHelper.spawnStackAtLocation(world, location, new ItemStack(item));
+                ItemHelper.spawnStackAtLocation(level(), location, new ItemStack(item));
 
-                ItemHelper.spawnStackAtLocation(world, location, getItemStackFromSlot(EquipmentSlotType.HEAD));
-                ItemHelper.spawnStackAtLocation(world, location, getItemStackFromSlot(EquipmentSlotType.CHEST));
-                ItemHelper.spawnStackAtLocation(world, location, getItemStackFromSlot(EquipmentSlotType.LEGS));
-                ItemHelper.spawnStackAtLocation(world, location, getItemStackFromSlot(EquipmentSlotType.FEET));
+                ItemHelper.spawnStackAtLocation(level(), location, getItemBySlot(EquipmentSlot.HEAD));
+                ItemHelper.spawnStackAtLocation(level(), location, getItemBySlot(EquipmentSlot.CHEST));
+                ItemHelper.spawnStackAtLocation(level(), location, getItemBySlot(EquipmentSlot.LEGS));
+                ItemHelper.spawnStackAtLocation(level(), location, getItemBySlot(EquipmentSlot.FEET));
 
-                if (!world.isRemote) {
-                    playSound(SoundEvents.BLOCK_WOOD_BREAK, 1, 1);
-                    playSound(SoundEvents.BLOCK_GRASS_BREAK, 1, 1);
+                if (!level().isClientSide) {
+                    playSound(SoundEvents.WOOD_BREAK, 1, 1);
+                    playSound(SoundEvents.GRASS_BREAK, 1, 1);
                 }
 
-                remove();
+                discard();
             }
 
             return true;
@@ -213,72 +217,72 @@ public class EntityChristmasTree extends Entity {
     }
 
     @Override
-    protected void registerData() {
-        dataManager.register(INVENTORY, NonNullList.withSize(4, ItemStack.EMPTY));
-        dataManager.register(WHITE, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(INVENTORY, NonNullList.withSize(4, ItemStack.EMPTY));
+        builder.define(WHITE, false);
     }
 
     @Override
-    protected void readAdditional(CompoundNBT nbt) {
+    protected void readAdditionalSaveData(CompoundTag nbt) {
 
         NonNullList<ItemStack> newInv = NonNullList.withSize(4, ItemStack.EMPTY);
 
-        newInv.set(0, ItemStack.read(nbt.getCompound("Head")));
-        newInv.set(1, ItemStack.read(nbt.getCompound("Chest")));
-        newInv.set(2, ItemStack.read(nbt.getCompound("Legs")));
-        newInv.set(3, ItemStack.read(nbt.getCompound("Feet")));
+        newInv.set(0, ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("Head")));
+        newInv.set(1, ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("Chest")));
+        newInv.set(2, ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("Legs")));
+        newInv.set(3, ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("Feet")));
 
-        dataManager.set(INVENTORY, newInv);
+        entityData.set(INVENTORY, newInv);
 
-        dataManager.set(WHITE, nbt.getBoolean("White"));
+        entityData.set(WHITE, nbt.getBoolean("White"));
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT nbt) {
+    protected void addAdditionalSaveData(CompoundTag nbt) {
 
-        CompoundNBT headTag = new CompoundNBT();
-        CompoundNBT chestTag = new CompoundNBT();
-        CompoundNBT legsTag = new CompoundNBT();
-        CompoundNBT feetTag = new CompoundNBT();
-        dataManager.get(INVENTORY).get(0).write(headTag);
-        dataManager.get(INVENTORY).get(1).write(chestTag);
-        dataManager.get(INVENTORY).get(2).write(legsTag);
-        dataManager.get(INVENTORY).get(3).write(feetTag);
+        CompoundTag headTag = new CompoundTag();
+        CompoundTag chestTag = new CompoundTag();
+        CompoundTag legsTag = new CompoundTag();
+        CompoundTag feetTag = new CompoundTag();
+        entityData.get(INVENTORY).get(0).save(level().registryAccess(), headTag);
+        entityData.get(INVENTORY).get(1).save(level().registryAccess(), chestTag);
+        entityData.get(INVENTORY).get(2).save(level().registryAccess(), legsTag);
+        entityData.get(INVENTORY).get(3).save(level().registryAccess(), feetTag);
         nbt.put("Head", headTag);
         nbt.put("Chest", chestTag);
         nbt.put("Legs", legsTag);
         nbt.put("Feet", feetTag);
 
-        nbt.putBoolean("White", dataManager.get(WHITE));
+        nbt.putBoolean("White", entityData.get(WHITE));
     }
 
     @Override
-    public boolean canCollide(Entity entity) {
+    public boolean canCollideWith(Entity entity) {
         return true;
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean isPickable() {
         return true;
     }
 
     @Override
-    protected boolean canTriggerWalking() {
+    protected boolean isMovementNoisy() {
         return false;
     }
 
     @Override
-    public void applyEntityCollision(Entity entityIn) {
-        super.applyEntityCollision(entityIn);
+    public void push(Entity entityIn) {
+        super.push(entityIn);
     }
 
     @Override
-    public float getCollisionBorderSize() {
+    public float getPickRadius() {
         return 0.0F;
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

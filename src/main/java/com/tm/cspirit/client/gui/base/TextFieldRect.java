@@ -2,7 +2,7 @@ package com.tm.cspirit.client.gui.base;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.StringTextComponent;
 
 public class TextFieldRect extends TextFieldWidget {
 

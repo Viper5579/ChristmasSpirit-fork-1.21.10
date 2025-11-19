@@ -3,7 +3,7 @@ package com.tm.cspirit.item;
 import com.tm.cspirit.entity.EntitySleigh;
 import com.tm.cspirit.item.base.ItemBase;
 import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 

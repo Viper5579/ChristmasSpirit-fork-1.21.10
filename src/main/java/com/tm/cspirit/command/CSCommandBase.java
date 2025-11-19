@@ -11,10 +11,10 @@ import com.tm.cspirit.util.helper.PresentHelper;
 import com.tm.cspirit.util.helper.ChatHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.tm.cspirit.util;
 
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.phys.shapes.IBooleanFunction;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShapes;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.tm.cspirit.event;
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.util.helper.EffectHelper;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

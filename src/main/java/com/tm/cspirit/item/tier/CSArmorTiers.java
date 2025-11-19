@@ -2,7 +2,7 @@ package com.tm.cspirit.item.tier;
 
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.main.CSReference;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.crafting.Ingredient;

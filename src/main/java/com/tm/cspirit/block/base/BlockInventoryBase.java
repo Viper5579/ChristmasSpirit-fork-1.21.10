@@ -4,19 +4,18 @@ import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import com.tm.cspirit.util.helper.InventoryHelper;
 import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * The base class for Blocks that have Inventories.
@@ -34,10 +33,10 @@ public abstract class BlockInventoryBase extends BlockTileEntityBase {
      * Drops all contents when the Block is broken.
      */
     @Override
-    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 
         Location location = new Location(world, pos);
-        TileEntity tileEntity = location.getTileEntity();
+        BlockEntity tileEntity = location.getTileEntity();
 
         if (tileEntity instanceof TileEntityInventoryBase) {
 
@@ -56,20 +55,20 @@ public abstract class BlockInventoryBase extends BlockTileEntityBase {
      * Opens the gui of the Block.
      */
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
 
         //Prevents client side.
-        if (world.isRemote) {
-            return ActionResultType.SUCCESS;
+        if (world.isClientSide) {
+            return InteractionResult.SUCCESS;
         }
 
         Location location = new Location(world, pos);
-        TileEntity tileEntity = location.getTileEntity();
+        BlockEntity tileEntity = location.getTileEntity();
 
-        if (player instanceof ServerPlayerEntity && tileEntity instanceof INamedContainerProvider) {
-            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, pos);
+        if (player instanceof ServerPlayer && tileEntity instanceof MenuProvider) {
+            player.openMenu((MenuProvider) tileEntity);
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

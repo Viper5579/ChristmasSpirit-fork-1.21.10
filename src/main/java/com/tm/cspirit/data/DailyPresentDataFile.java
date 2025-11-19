@@ -3,7 +3,7 @@ package com.tm.cspirit.data;
 import com.google.gson.reflect.TypeToken;
 import com.tm.cspirit.util.helper.FileHelper;
 import com.tm.cspirit.util.helper.TimeHelper;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;

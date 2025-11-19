@@ -6,7 +6,7 @@ import com.tm.cspirit.main.CSReference;
 import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.layers.BipedArmorLayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderJackFrost extends BipedRenderer<EntityJackFrost, ModelJackFrost<EntityJackFrost>> {
 

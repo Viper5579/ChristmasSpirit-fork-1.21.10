@@ -7,16 +7,16 @@ import com.tm.cspirit.tileentity.TileEntityPresentWrapped;
 import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.helper.ItemHelper;
 import com.tm.cspirit.util.helper.TimeHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ITextComponent;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 

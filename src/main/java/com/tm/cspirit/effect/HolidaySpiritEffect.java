@@ -1,6 +1,6 @@
 package com.tm.cspirit.effect;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
 

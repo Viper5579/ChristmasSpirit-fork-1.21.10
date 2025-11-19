@@ -3,12 +3,12 @@ package com.tm.cspirit.util.helper;
 import com.tm.cspirit.data.NaughtyListFile;
 import com.tm.cspirit.init.InitEffects;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.TextFormatting;
 
 public class EffectHelper {
 

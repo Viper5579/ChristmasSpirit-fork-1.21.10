@@ -2,8 +2,8 @@ package com.tm.cspirit.event;
 
 import com.tm.cspirit.main.CSConfig;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

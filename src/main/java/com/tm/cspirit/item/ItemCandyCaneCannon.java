@@ -5,16 +5,16 @@ import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.item.base.ItemBase;
 import com.tm.cspirit.main.CSConfig;
 import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.UseAction;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 public class ItemCandyCaneCannon extends ItemBase {
 

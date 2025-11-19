@@ -2,8 +2,8 @@ package com.tm.cspirit.tab;
 
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.main.CSReference;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 public class CSTabDecoration extends ItemGroup {
 

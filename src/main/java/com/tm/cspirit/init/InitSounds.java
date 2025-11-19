@@ -1,7 +1,7 @@
 package com.tm.cspirit.init;
 
 import com.tm.cspirit.main.CSReference;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

@@ -4,10 +4,10 @@ import com.tm.cspirit.init.InitContainerTypes;
 import com.tm.cspirit.inventory.base.ContainerBase;
 import com.tm.cspirit.inventory.base.SlotLimitedStack;
 import com.tm.cspirit.tileentity.TileEntityCookieTray;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ClickType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
 public class ContainerCookieTray extends ContainerBase {

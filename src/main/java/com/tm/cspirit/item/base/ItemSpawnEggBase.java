@@ -1,19 +1,18 @@
 package com.tm.cspirit.item.base;
 
-import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.dispenser.DefaultDispenseItemBehavior;
-import net.minecraft.dispenser.IBlockSource;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class ItemSpawnEggBase extends SpawnEggItem {
     private final Lazy<? extends EntityType<?>> entityTypeSupplier;
 
     public ItemSpawnEggBase(final RegistryObject<? extends EntityType<?>> entityTypeSupplier) {
-        super(null, 0xFFFFFF, 0xFFFFFF, new Item.Properties().group(ChristmasSpirit.TAB_MAIN));
+        super(null, 0xFFFFFF, 0xFFFFFF, new Item.Properties());
         this.entityTypeSupplier = Lazy.of(entityTypeSupplier);
         UNADDED_EGGS.add(this);
     }
@@ -37,10 +36,10 @@ public class ItemSpawnEggBase extends SpawnEggItem {
         DefaultDispenseItemBehavior dispenseBehavior = new DefaultDispenseItemBehavior() {
 
             @Override
-            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack) {
-                Direction direction = source.getBlockState().get(DispenserBlock.FACING);
+            protected ItemStack execute(net.minecraft.core.dispenser.BlockSource source, ItemStack stack) {
+                Direction direction = source.state().getValue(DispenserBlock.FACING);
                 EntityType<?> type = ((SpawnEggItem) stack.getItem()).getType(stack.getTag());
-                type.spawn(source.getWorld(), stack, null, source.getBlockPos(), SpawnReason.DISPENSER, direction != Direction.DOWN, false);
+                type.spawn(source.level(), stack, null, source.pos(), MobSpawnType.DISPENSER, direction != Direction.DOWN, false);
                 stack.shrink(1);
                 return stack;
             }
@@ -48,14 +47,14 @@ public class ItemSpawnEggBase extends SpawnEggItem {
 
         for (final SpawnEggItem spawnEgg : UNADDED_EGGS) {
             EGGS.put(spawnEgg.getType(null), spawnEgg);
-            DispenserBlock.registerDispenseBehavior(spawnEgg, dispenseBehavior);
+            DispenserBlock.registerBehavior(spawnEgg, dispenseBehavior);
         }
 
         UNADDED_EGGS.clear();
     }
 
     @Override
-    public EntityType<?> getType(CompoundNBT nbt) {
+    public EntityType<?> getType(CompoundTag nbt) {
         return this.entityTypeSupplier.get();
     }
 }

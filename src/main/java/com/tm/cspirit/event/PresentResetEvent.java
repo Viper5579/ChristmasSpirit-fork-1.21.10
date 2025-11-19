@@ -4,7 +4,7 @@ import com.tm.cspirit.data.DailyPresentDataFile;
 import com.tm.cspirit.util.helper.PresentHelper;
 import com.tm.cspirit.util.helper.TimeHelper;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

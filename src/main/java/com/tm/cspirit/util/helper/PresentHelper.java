@@ -8,13 +8,13 @@ import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.init.InitSounds;
 import com.tm.cspirit.present.PresentConstructor;
 import com.tm.cspirit.util.Location;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;

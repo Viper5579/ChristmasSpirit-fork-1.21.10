@@ -4,12 +4,12 @@ import com.tm.cspirit.init.InitTileEntityTypes;
 import com.tm.cspirit.inventory.ContainerPresentWrapped;
 import com.tm.cspirit.present.PresentConstructor;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ITextComponent;
+import net.minecraft.network.chat.StringTextComponent;
 
 public class TileEntityPresentWrapped extends TileEntityInventoryBase {
 

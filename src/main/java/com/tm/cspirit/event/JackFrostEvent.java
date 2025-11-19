@@ -2,9 +2,9 @@ package com.tm.cspirit.event;
 
 import com.tm.cspirit.entity.EntityJackFrost;
 import com.tm.cspirit.util.helper.ChatHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

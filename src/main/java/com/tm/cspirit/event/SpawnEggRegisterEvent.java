@@ -1,7 +1,7 @@
 package com.tm.cspirit.event;
 
 import com.tm.cspirit.item.base.ItemSpawnEggBase;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

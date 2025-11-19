@@ -2,7 +2,7 @@ package com.tm.cspirit.data;
 
 import com.google.gson.reflect.TypeToken;
 import com.tm.cspirit.util.helper.FileHelper;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;

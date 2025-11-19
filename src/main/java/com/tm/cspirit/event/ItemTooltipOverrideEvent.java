@@ -2,10 +2,10 @@ package com.tm.cspirit.event;
 
 import com.tm.cspirit.item.base.IItemSpiritSupplier;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.item.Item;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.network.chat.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

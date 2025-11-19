@@ -1,7 +1,7 @@
 package com.tm.cspirit.present;
 
 import com.tm.cspirit.init.InitItems;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 public enum PresentStyle {
 

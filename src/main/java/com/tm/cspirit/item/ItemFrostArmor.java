@@ -5,12 +5,12 @@ import com.tm.cspirit.item.base.ItemArmorBase;
 import com.tm.cspirit.item.tier.CSArmorTiers;
 import com.tm.cspirit.main.CSConfig;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.ITextComponent;
+import net.minecraft.network.chat.StringTextComponent;
+import net.minecraft.network.chat.TextFormatting;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 

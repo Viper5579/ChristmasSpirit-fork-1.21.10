@@ -3,8 +3,8 @@ package com.tm.cspirit.event;
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.util.helper.ItemHelper;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

@@ -1,13 +1,13 @@
 package com.tm.cspirit.util.helper;
 
 import com.google.common.collect.Lists;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.FireworkRocketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListNBT;
 
 import java.util.List;
