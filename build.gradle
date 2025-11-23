@@ -78,6 +78,19 @@ dependencies {
     runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}"
 }
 
+// Apple Silicon (M-series Mac) LWJGL Fix
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('org.lwjgl:lwjgl-freetype:3.3.3') using module('org.lwjgl:lwjgl-freetype:3.3.4')
+        substitute module('org.lwjgl:lwjgl-opengl:3.3.3') using module('org.lwjgl:lwjgl-opengl:3.3.4')
+        substitute module('org.lwjgl:lwjgl-glfw:3.3.3') using module('org.lwjgl:lwjgl-glfw:3.3.4')
+        substitute module('org.lwjgl:lwjgl-jemalloc:3.3.3') using module('org.lwjgl:lwjgl-jemalloc:3.3.4')
+        substitute module('org.lwjgl:lwjgl-stb:3.3.3') using module('org.lwjgl:lwjgl-stb:3.3.4')
+        substitute module('org.lwjgl:lwjgl-tinyfd:3.3.3') using module('org.lwjgl:lwjgl-tinyfd:3.3.4')
+        substitute module('org.lwjgl:lwjgl:3.3.3') using module('org.lwjgl:lwjgl:3.3.4')
+    }
+}
+
 jar {
     manifest {
         attributes([

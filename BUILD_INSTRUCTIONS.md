@@ -10,7 +10,36 @@ This mod has been successfully updated from 1.16.4 to 1.21.1.
 - **Forge Version:** 52.0.17
 - **Java Version Required:** 21
 
+### Prerequisites
+
+#### Install Java 21
+You **must** have Java 21 installed. Java 17 will not work.
+
+**On macOS (using Homebrew):**
+```bash
+brew install --cask temurin21
+```
+
+**On macOS/Linux (using SDKMAN):**
+```bash
+sdk install java 21.0.1-tem
+```
+
+**Manual Download:**
+- [Adoptium Temurin 21](https://adoptium.net/temurin/releases/?version=21)
+
+Verify your Java version:
+```bash
+java -version
+# Should show: openjdk version "21.x.x"
+```
+
 ### Building the Mod
+
+**Important:** Make sure you're on the correct branch!
+```bash
+git checkout claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq
+```
 
 To build the mod JAR file, you need an internet connection for the first build to download dependencies.
 
@@ -29,6 +58,17 @@ The compiled JAR will be located in:
 ```
 build/libs/ChristmasSpirit-1.0.15.jar
 ```
+
+### Troubleshooting
+
+#### Apple Silicon (M-series) Macs
+If you get LWJGL errors on Apple Silicon Macs, the build.gradle already includes a fix that upgrades LWJGL from 3.3.3 to 3.3.4, which has proper arm64 support.
+
+#### Java Version Error
+If you see "Use Java 8" or Java version errors, make sure:
+1. You're on the correct branch (claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq)
+2. Java 21 is installed and active
+3. Run `java -version` to verify
 
 ### What's New in v1.0.15
 - Updated to Minecraft 1.21.1
