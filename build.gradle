@@ -79,8 +79,9 @@ dependencies {
 }
 
 // Apple Silicon (M-series Mac) LWJGL Fix
-configurations.all {
+configurations.configureEach {
     resolutionStrategy.dependencySubstitution {
+        // Upgrade LWJGL to 3.3.4 which has proper Apple Silicon support
         substitute module('org.lwjgl:lwjgl-freetype:3.3.3') using module('org.lwjgl:lwjgl-freetype:3.3.4')
         substitute module('org.lwjgl:lwjgl-opengl:3.3.3') using module('org.lwjgl:lwjgl-opengl:3.3.4')
         substitute module('org.lwjgl:lwjgl-glfw:3.3.3') using module('org.lwjgl:lwjgl-glfw:3.3.4')
@@ -88,6 +89,14 @@ configurations.all {
         substitute module('org.lwjgl:lwjgl-stb:3.3.3') using module('org.lwjgl:lwjgl-stb:3.3.4')
         substitute module('org.lwjgl:lwjgl-tinyfd:3.3.3') using module('org.lwjgl:lwjgl-tinyfd:3.3.4')
         substitute module('org.lwjgl:lwjgl:3.3.3') using module('org.lwjgl:lwjgl:3.3.4')
+    }
+
+    resolutionStrategy.eachDependency { details ->
+        // Replace the non-existent 'natives-macos-patch' with 'natives-macos-arm64'
+        if (details.requested.group == 'org.lwjgl' && details.requested.name.contains('natives-macos-patch')) {
+            def newName = details.requested.name.replace('natives-macos-patch', 'natives-macos-arm64')
+            details.useTarget(group: details.requested.group, name: newName, version: details.requested.version)
+        }
     }
 }
 
