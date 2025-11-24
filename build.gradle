@@ -76,9 +76,21 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}"
+
+    // Apple Silicon (M-series Mac) LWJGL natives fix
+    // Explicitly add correct LWJGL natives to override ForgeGradle's broken natives-macos-patch
+    if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.name").contains("Mac")) {
+        implementation "org.lwjgl:lwjgl:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-glfw:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-opengl:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-stb:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-tinyfd:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-jemalloc:3.3.4:natives-macos-arm64"
+        implementation "org.lwjgl:lwjgl-freetype:3.3.4:natives-macos-arm64"
+    }
 }
 
-// Force correct LWJGL natives for Apple Silicon BEFORE other configurations
+// Force correct LWJGL versions for Apple Silicon
 if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.name").contains("Mac")) {
     configurations.all {
         resolutionStrategy {
@@ -90,24 +102,9 @@ if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.
             force "org.lwjgl:lwjgl-jemalloc:3.3.4"
             force "org.lwjgl:lwjgl-freetype:3.3.4"
         }
-    }
-}
 
-// Apple Silicon (M-series Mac) LWJGL natives fix
-// Replace non-existent 'natives-macos-patch' with 'natives-macos-arm64'
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        if (details.requested.group == 'org.lwjgl' && details.requested.name.endsWith('-natives-macos-patch')) {
-            // Extract base module name (e.g., 'lwjgl-freetype' from 'lwjgl-freetype-natives-macos-patch')
-            def baseName = details.requested.name.replaceAll('-natives-macos-patch$', '')
-            // Replace with the correct arm64 variant
-            details.useTarget(
-                group: 'org.lwjgl',
-                name: "${baseName}-natives-macos-arm64",
-                version: '3.3.4'
-            )
-            println "Replaced LWJGL dependency: ${details.requested.name} -> ${baseName}-natives-macos-arm64:3.3.4"
-        }
+        // Exclude the broken natives-macos-patch variants
+        exclude group: 'org.lwjgl', module: '*natives-macos-patch*'
     }
 }
 
