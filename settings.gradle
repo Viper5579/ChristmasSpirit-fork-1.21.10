@@ -1,7 +1,33 @@
 pluginManagement {
     repositories {
+        // Local repository for LWJGL Apple Silicon fix - MUST BE FIRST
+        maven {
+            name = 'LWJGL-Apple-Silicon-Fix'
+            url = uri("${settingsDir}/.gradle-local-repo")
+        }
         gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }
+    }
+}
+
+// Also apply to all dependency resolution
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        // Local repository for LWJGL Apple Silicon fix - MUST BE FIRST
+        maven {
+            name = 'LWJGL-Apple-Silicon-Fix-Main'
+            url = uri("${settingsDir}/.gradle-local-repo")
+        }
+        mavenCentral()
+        maven {
+            name = "Jared's maven"
+            url = "https://maven.blamejared.com/"
+        }
+        maven {
+            name = "ModMaven"
+            url = "https://modmaven.dev"
+        }
     }
 }
 
