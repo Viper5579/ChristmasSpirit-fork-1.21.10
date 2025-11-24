@@ -25,6 +25,11 @@ dependencyResolutionManagement {
             name = 'MinecraftForge'
             url = 'https://maven.minecraftforge.net/'
         }
+        // Mojang Maven - required for Minecraft client and Mojang libraries
+        maven {
+            name = 'Mojang'
+            url = 'https://libraries.minecraft.net/'
+        }
         maven {
             name = "Jared's maven"
             url = "https://maven.blamejared.com/"
