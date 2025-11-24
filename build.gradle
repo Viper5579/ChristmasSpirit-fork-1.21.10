@@ -82,9 +82,6 @@ dependencies {
 if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.name").contains("Mac")) {
     configurations.all {
         resolutionStrategy {
-            dependencySubstitution {
-                substitute platform("org.lwjgl:lwjgl-bom:3.3.3") using platform("org.lwjgl:lwjgl-bom:3.3.4")
-            }
             force "org.lwjgl:lwjgl:3.3.4"
             force "org.lwjgl:lwjgl-glfw:3.3.4"
             force "org.lwjgl:lwjgl-opengl:3.3.4"
