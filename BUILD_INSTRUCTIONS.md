@@ -39,20 +39,37 @@ java -version
 **Important:** Make sure you're on the correct branch!
 ```bash
 git checkout claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq
+git pull origin claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq
 ```
 
+#### Step 1: Set up LWJGL repository (Apple Silicon Macs only)
+If you're on an Apple Silicon (M-series) Mac, run this script first:
+```bash
+chmod +x create-lwjgl-repo.sh
+./create-lwjgl-repo.sh
+```
+
+This creates a local Maven repository that fixes LWJGL compatibility issues on ARM64 Macs.
+
+#### Step 2: Build the mod
 To build the mod JAR file, you need an internet connection for the first build to download dependencies.
 
-#### On Linux/Mac:
+**On Linux/Mac:**
 ```bash
 chmod +x gradlew
-./gradlew build
+./gradlew clean build
 ```
 
-#### On Windows:
+**On Windows:**
 ```cmd
-gradlew.bat build
+gradlew.bat clean build
 ```
+
+The build process will:
+1. Download Gradle 8.10 (first time only)
+2. Download Minecraft, Forge, and all dependencies
+3. Compile the mod
+4. Create the JAR file
 
 The compiled JAR will be located in:
 ```
@@ -61,8 +78,18 @@ build/libs/ChristmasSpirit-1.0.15.jar
 
 ### Troubleshooting
 
-#### Apple Silicon (M-series) Macs
-If you get LWJGL errors on Apple Silicon Macs, the build.gradle already includes a fix that upgrades LWJGL from 3.3.3 to 3.3.4, which has proper arm64 support.
+#### Apple Silicon (M-series) Macs - LWJGL natives-macos-patch Error
+**Symptoms:** Build fails with errors like:
+```
+Could not find lwjgl-freetype-3.3.3-natives-macos-patch.jar
+```
+
+**Solution:** This is fixed by running the `create-lwjgl-repo.sh` script BEFORE building:
+```bash
+./create-lwjgl-repo.sh
+```
+
+The script creates fake `natives-macos-patch` artifacts that redirect to the correct `natives-macos-arm64` versions. This workaround is necessary because ForgeGradle looks for a classifier that doesn't exist in Maven repositories.
 
 #### Java Version Error
 If you see "Use Java 8" or Java version errors, make sure:
