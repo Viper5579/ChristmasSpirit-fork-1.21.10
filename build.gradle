@@ -58,21 +58,8 @@ minecraft {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {
-    // Local repository with LWJGL Apple Silicon fixes - MUST BE FIRST
-    maven {
-        name = "LWJGL-Apple-Silicon-Fix"
-        url = uri("${projectDir}/.gradle-local-repo")
-    }
-    maven {
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-}
+// Repositories are configured in settings.gradle using dependencyResolutionManagement
+// This ensures ForgeGradle can access them during plugin initialization
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
