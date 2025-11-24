@@ -59,6 +59,11 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    // Local repository with LWJGL Apple Silicon fixes - MUST BE FIRST
+    maven {
+        name = "LWJGL-Apple-Silicon-Fix"
+        url = uri("${projectDir}/.gradle-local-repo")
+    }
     maven {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
@@ -76,36 +81,6 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}"
-
-    // Apple Silicon (M-series Mac) LWJGL natives fix
-    // Explicitly add correct LWJGL natives to override ForgeGradle's broken natives-macos-patch
-    if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.name").contains("Mac")) {
-        implementation "org.lwjgl:lwjgl:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-glfw:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-opengl:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-stb:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-tinyfd:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-jemalloc:3.3.4:natives-macos-arm64"
-        implementation "org.lwjgl:lwjgl-freetype:3.3.4:natives-macos-arm64"
-    }
-}
-
-// Force correct LWJGL versions for Apple Silicon
-if (System.getProperty("os.arch").contains("aarch64") && System.getProperty("os.name").contains("Mac")) {
-    configurations.all {
-        resolutionStrategy {
-            force "org.lwjgl:lwjgl:3.3.4"
-            force "org.lwjgl:lwjgl-glfw:3.3.4"
-            force "org.lwjgl:lwjgl-opengl:3.3.4"
-            force "org.lwjgl:lwjgl-stb:3.3.4"
-            force "org.lwjgl:lwjgl-tinyfd:3.3.4"
-            force "org.lwjgl:lwjgl-jemalloc:3.3.4"
-            force "org.lwjgl:lwjgl-freetype:3.3.4"
-        }
-
-        // Exclude the broken natives-macos-patch variants
-        exclude group: 'org.lwjgl', module: '*natives-macos-patch*'
-    }
 }
 
 jar {

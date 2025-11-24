@@ -1,0 +1,38 @@
+// Gradle init script to fix LWJGL natives-macos-patch issue on Apple Silicon
+// This runs BEFORE ForgeGradle resolves dependencies
+
+allprojects {
+    buildscript {
+        repositories.all { repo ->
+            if (repo instanceof MavenArtifactRepository) {
+                repo.content {
+                    excludeGroup "org.lwjgl"
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "LWJGL-Apple-Silicon-Fix"
+                url = uri("${rootProject.projectDir}/.gradle-local-repo")
+            }
+            mavenCentral()
+        }
+    }
+
+    repositories.all { repo ->
+        if (repo instanceof MavenArtifactRepository && repo.url.toString().contains("maven.apache.org")) {
+            repo.content {
+                excludeGroupByRegex "org\\.lwjgl"
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "LWJGL-Apple-Silicon-Fix-Main"
+            url = uri("${rootProject.projectDir}/.gradle-local-repo")
+        }
+        mavenCentral()
+    }
+}
