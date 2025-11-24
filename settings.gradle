@@ -20,6 +20,11 @@ dependencyResolutionManagement {
             url = uri("${settingsDir}/.gradle-local-repo")
         }
         mavenCentral()
+        // Forge Maven - required for Minecraft and Forge artifacts
+        maven {
+            name = 'MinecraftForge'
+            url = 'https://maven.minecraftforge.net/'
+        }
         maven {
             name = "Jared's maven"
             url = "https://maven.blamejared.com/"
