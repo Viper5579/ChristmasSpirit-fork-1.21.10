@@ -79,23 +79,25 @@ dependencies {
 }
 
 // Apple Silicon (M-series Mac) LWJGL Fix
+// This completely replaces problematic LWJGL dependencies with working ones
 configurations.configureEach {
-    resolutionStrategy.dependencySubstitution {
-        // Upgrade LWJGL to 3.3.4 which has proper Apple Silicon support
-        substitute module('org.lwjgl:lwjgl-freetype:3.3.3') using module('org.lwjgl:lwjgl-freetype:3.3.4')
-        substitute module('org.lwjgl:lwjgl-opengl:3.3.3') using module('org.lwjgl:lwjgl-opengl:3.3.4')
-        substitute module('org.lwjgl:lwjgl-glfw:3.3.3') using module('org.lwjgl:lwjgl-glfw:3.3.4')
-        substitute module('org.lwjgl:lwjgl-jemalloc:3.3.3') using module('org.lwjgl:lwjgl-jemalloc:3.3.4')
-        substitute module('org.lwjgl:lwjgl-stb:3.3.3') using module('org.lwjgl:lwjgl-stb:3.3.4')
-        substitute module('org.lwjgl:lwjgl-tinyfd:3.3.3') using module('org.lwjgl:lwjgl-tinyfd:3.3.4')
-        substitute module('org.lwjgl:lwjgl:3.3.3') using module('org.lwjgl:lwjgl:3.3.4')
-    }
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.lwjgl') {
+            def requestedName = details.requested.name
 
-    resolutionStrategy.eachDependency { details ->
-        // Replace the non-existent 'natives-macos-patch' with 'natives-macos-arm64'
-        if (details.requested.group == 'org.lwjgl' && details.requested.name.contains('natives-macos-patch')) {
-            def newName = details.requested.name.replace('natives-macos-patch', 'natives-macos-arm64')
-            details.useTarget(group: details.requested.group, name: newName, version: details.requested.version)
+            // Handle natives-macos-patch -> natives-macos-arm64
+            if (requestedName.endsWith('-natives-macos-patch')) {
+                def baseName = requestedName.replace('-natives-macos-patch', '')
+                details.useTarget(
+                    group: 'org.lwjgl',
+                    name: "${baseName}-natives-macos-arm64",
+                    version: '3.3.4'
+                )
+            }
+            // Upgrade base LWJGL modules to 3.3.4
+            else if (requestedName.startsWith('lwjgl') && details.requested.version == '3.3.3') {
+                details.useVersion('3.3.4')
+            }
         }
     }
 }
