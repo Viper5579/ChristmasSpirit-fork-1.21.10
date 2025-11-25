@@ -78,6 +78,25 @@ build/libs/ChristmasSpirit-1.0.15.jar
 
 ### Troubleshooting
 
+#### Build fails with "Could not find net.minecraft:client:1.21.1"
+**Symptoms:** Build fails during configuration with:
+```
+Could not find net.minecraft:client:1.21.1
+Searched in the following locations:...
+```
+
+**Solution:** This is a repository configuration issue that has been fixed in the latest version. Make sure you have the latest changes:
+```bash
+git pull origin claude/debug-arm-mac-build-019zgTs14y3YvMiPEa2FccNs
+./gradlew clean build --refresh-dependencies
+```
+
+If the issue persists, clear your Gradle cache:
+```bash
+rm -rf ~/.gradle/caches
+./gradlew clean build
+```
+
 #### Apple Silicon (M-series) Macs - LWJGL natives-macos-patch Error
 **Symptoms:** Build fails with errors like:
 ```

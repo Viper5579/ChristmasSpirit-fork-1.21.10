@@ -12,7 +12,8 @@ pluginManagement {
 
 // Also apply to all dependency resolution
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    // Don't set repositoriesMode - allow ForgeGradle to add its own repositories
+    // repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         // Local repository for LWJGL Apple Silicon fix - MUST BE FIRST
         maven {
