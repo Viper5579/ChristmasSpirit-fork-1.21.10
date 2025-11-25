@@ -38,18 +38,31 @@ java -version
 
 **Important:** Make sure you're on the correct branch!
 ```bash
-git checkout claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq
-git pull origin claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq
+git checkout claude/debug-arm-mac-build-019zgTs14y3YvMiPEa2FccNs
+git pull origin claude/debug-arm-mac-build-019zgTs14y3YvMiPEa2FccNs
 ```
 
+**Note:** This branch includes all the ARM Mac build fixes. Once merged, you'll use the main release branch.
+
 #### Step 1: Set up LWJGL repository (Apple Silicon Macs only)
-If you're on an Apple Silicon (M-series) Mac, run this script first:
+**CRITICAL FOR ARM MAC USERS:** If you're on an Apple Silicon (M-series) Mac, you MUST run this script BEFORE building:
+
 ```bash
 chmod +x create-lwjgl-repo.sh
 ./create-lwjgl-repo.sh
 ```
 
-This creates a local Maven repository that fixes LWJGL compatibility issues on ARM64 Macs.
+This script:
+- Downloads the ARM64 native libraries for LWJGL from Maven Central
+- Saves them with the `natives-macos-patch` classifier that ForgeGradle expects
+- Creates a local Maven repository in `.gradle-local-repo/`
+
+**Why is this needed?** ForgeGradle 6.x requests LWJGL natives with classifier `natives-macos-patch`, but this classifier doesn't exist in any public Maven repository. The script downloads the correct `natives-macos-arm64` JARs and renames them so Gradle can find them.
+
+**Without running this script, the build will fail with:**
+```
+Could not find lwjgl-*-3.3.3-natives-macos-patch.jar
+```
 
 #### Step 2: Build the mod
 To build the mod JAR file, you need an internet connection for the first build to download dependencies.
@@ -101,18 +114,27 @@ rm -rf ~/.gradle/caches
 **Symptoms:** Build fails with errors like:
 ```
 Could not find lwjgl-freetype-3.3.3-natives-macos-patch.jar
+Searched in the following locations:
+  https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl-freetype/3.3.3/lwjgl-freetype-3.3.3-natives-macos-patch.jar
 ```
 
-**Solution:** This is fixed by running the `create-lwjgl-repo.sh` script BEFORE building:
+**Solution:** You MUST run the `create-lwjgl-repo.sh` script BEFORE building:
 ```bash
+chmod +x create-lwjgl-repo.sh
 ./create-lwjgl-repo.sh
 ```
 
-The script creates fake `natives-macos-patch` artifacts that redirect to the correct `natives-macos-arm64` versions. This workaround is necessary because ForgeGradle looks for a classifier that doesn't exist in Maven repositories.
+The script downloads ARM64 native libraries and saves them with the `natives-macos-patch` classifier that ForgeGradle expects.
+
+**If you've already run the script but still see this error:**
+1. Delete the `.gradle-local-repo` directory: `rm -rf .gradle-local-repo`
+2. Run the script again: `./create-lwjgl-repo.sh`
+3. Clear Gradle cache: `rm -rf ~/.gradle/caches`
+4. Build again: `./gradlew clean build`
 
 #### Java Version Error
 If you see "Use Java 8" or Java version errors, make sure:
-1. You're on the correct branch (claude/prepare-v1-21-10-release-015giAZzQLD7Somnni9hgCdq)
+1. You're on the correct branch (claude/debug-arm-mac-build-019zgTs14y3YvMiPEa2FccNs)
 2. Java 21 is installed and active
 3. Run `java -version` to verify
 
