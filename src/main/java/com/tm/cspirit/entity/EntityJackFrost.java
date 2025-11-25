@@ -4,103 +4,116 @@ import com.tm.cspirit.data.NaughtyListFile;
 import com.tm.cspirit.init.InitEntityTypes;
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
-public class EntityJackFrost extends CreatureEntity implements IAngerable {
+public class EntityJackFrost extends PathfinderMob implements NeutralMob {
 
     private int attackTimer;
     private int tradeCooldown;
 
-    private static final RangedInteger randomTime = TickRangeConverter.convertRange(20, 39);
-    private int angerTime;
-    private UUID angerTarget;
+    private static final UniformInt ANGER_TIME_RANGE = UniformInt.of(20, 39);
+    private int remainingPersistentAngerTime;
+    @Nullable
+    private UUID persistentAngerTarget;
 
-    public EntityJackFrost(EntityType<? extends CreatureEntity> type, World world) {
+    public EntityJackFrost(EntityType<? extends PathfinderMob> type, Level world) {
         super(type, world);
-        setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(InitItems.FROSTMOURNE.get()));
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(InitItems.FROSTMOURNE.get()));
     }
 
-    public EntityJackFrost(World world, int x, int y, int z) {
+    public EntityJackFrost(Level world, int x, int y, int z) {
         super(InitEntityTypes.JACK_FROST.get(), world);
-        setLocationAndAngles(x, y, z, 0, 0);
-        setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(InitItems.FROSTMOURNE.get()));
+        setPos(x, y, z);
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(InitItems.FROSTMOURNE.get()));
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.func_233666_p_()
-                .createMutableAttribute(Attributes.MAX_HEALTH, 60D)
-                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.4D)
-                .createMutableAttribute(Attributes.ATTACK_DAMAGE, 5);
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 60D)
+                .add(Attributes.MOVEMENT_SPEED, 0.4D)
+                .add(Attributes.ATTACK_DAMAGE, 5);
     }
 
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(2, new MoveTowardsTargetGoal(this, 0.9D, 32.0F));
-        this.goalSelector.addGoal(7, new LookAtGoal(this, PlayerEntity.class, 6.0F));
-        this.goalSelector.addGoal(8, new LookRandomlyGoal(this));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::func_233680_b_));
-        this.targetSelector.addGoal(4, new ResetAngerGoal<>(this, false));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
+        this.targetSelector.addGoal(4, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
     @Override
-    public void livingTick() {
-        super.livingTick();
+    public void aiStep() {
+        super.aiStep();
 
-        if (world.isDaytime()) addPotionEffect(new EffectInstance(Effects.LEVITATION, 20, 4));
-        else {
-            addPotionEffect(new EffectInstance(Effects.SLOW_FALLING, 20));
-            addPotionEffect(new EffectInstance(Effects.GLOWING, 20));
+        if (level().isDay()) {
+            addEffect(new MobEffectInstance(MobEffects.LEVITATION, 20, 4));
+        } else {
+            addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20));
+            addEffect(new MobEffectInstance(MobEffects.GLOWING, 20));
         }
 
-        if (getPosY() > 300) {
-            remove();
+        if (getY() > 300) {
+            discard();
         }
 
         if (this.attackTimer > 0) {
             --this.attackTimer;
         }
 
-        if (!this.world.isRemote) {
-            this.func_241359_a_((ServerWorld)this.world, true);
+        if (!this.level().isClientSide) {
+            this.updatePersistentAnger((ServerLevel)this.level(), true);
         }
 
-        if (!world.isRemote) {
+        if (!level().isClientSide) {
 
-            if (getAngerTarget() != null && world.getPlayerByUuid(getAngerTarget()) != null) {
-                if (NaughtyListFile.isOnNaughtyList(Objects.requireNonNull(world.getPlayerByUuid(getAngerTarget())))) {
-                    setAngerTarget(null);
+            if (getPersistentAngerTarget() != null && level().getPlayerByUUID(getPersistentAngerTarget()) != null) {
+                if (NaughtyListFile.isOnNaughtyList(Objects.requireNonNull(level().getPlayerByUUID(getPersistentAngerTarget())))) {
+                    setPersistentAngerTarget(null);
                 }
             }
 
             int radius = 35;
 
-            List<PlayerEntity> closePlayers = world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB(getPosition().getX() - radius, getPosition().getY() - radius, getPosition().getZ() - radius, getPosition().getX() + radius, getPosition().getY() + radius, getPosition().getZ() + radius));
+            List<Player> closePlayers = level().getEntitiesOfClass(Player.class, new AABB(
+                    blockPosition().getX() - radius, blockPosition().getY() - radius, blockPosition().getZ() - radius,
+                    blockPosition().getX() + radius, blockPosition().getY() + radius, blockPosition().getZ() + radius));
 
-            for (PlayerEntity player : closePlayers) {
+            for (Player player : closePlayers) {
 
                 if (!NaughtyListFile.isOnNaughtyList(player)) {
-                    setAngerTarget(player.getUniqueID());
+                    setPersistentAngerTarget(player.getUUID());
                     break;
                 }
             }
@@ -108,103 +121,100 @@ public class EntityJackFrost extends CreatureEntity implements IAngerable {
     }
 
     @Override
-    protected ActionResultType func_230254_b_(PlayerEntity player, Hand hand) {
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 
-        if (!world.isRemote) {
+        if (!level().isClientSide) {
 
-            if (hand == Hand.OFF_HAND) {
-                return ActionResultType.FAIL;
+            if (hand == InteractionHand.OFF_HAND) {
+                return InteractionResult.FAIL;
             }
 
             if (NaughtyListFile.isOnNaughtyList(player)) {
 
-                if (getItemStackFromSlot(EquipmentSlotType.OFFHAND).isEmpty()) {
+                if (getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) {
 
-                    ItemStack heldStack = player.getHeldItemMainhand();
+                    ItemStack heldStack = player.getMainHandItem();
 
                     if (heldStack.getItem() == InitItems.LUMP_OF_COAL.get()) {
 
                         if (heldStack.getCount() >= 5) {
 
-                            Random random = new Random();
-                            ItemHelper.spawnStack(world, getPosX(), getPosY(), getPosZ(), (random.nextDouble() / 2) - 0.25D, 0.2D, (random.nextDouble() / 2) - 0.25D, new ItemStack(InitItems.FROST_INGOT.get()));
+                            RandomSource random = level().getRandom();
+                            ItemHelper.spawnStack(level(), getX(), getY(), getZ(), (random.nextDouble() / 2) - 0.25D, 0.2D, (random.nextDouble() / 2) - 0.25D, new ItemStack(InitItems.FROST_INGOT.get()));
 
                             heldStack.shrink(5);
 
-                            return ActionResultType.SUCCESS;
+                            return InteractionResult.SUCCESS;
                         }
                     }
                 }
             }
         }
 
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public int getAngerTime() {
-        return angerTime;
+    public int getRemainingPersistentAngerTime() {
+        return remainingPersistentAngerTime;
     }
 
     @Override
-    public void setAngerTime(int time) {
-        angerTime = time;
+    public void setRemainingPersistentAngerTime(int time) {
+        remainingPersistentAngerTime = time;
     }
 
     @Override
-    public UUID getAngerTarget() {
-        return angerTarget;
+    @Nullable
+    public UUID getPersistentAngerTarget() {
+        return persistentAngerTarget;
     }
 
     @Override
-    public void setAngerTarget(UUID target) {
-        angerTarget = target;
+    public void setPersistentAngerTarget(@Nullable UUID target) {
+        persistentAngerTarget = target;
     }
 
     @Override
-    public void func_230258_H__() {
-        this.setAngerTime(randomTime.getRandomWithinRange(this.rand));
+    public void startPersistentAngerTimer() {
+        this.setRemainingPersistentAngerTime(ANGER_TIME_RANGE.sample(this.random));
     }
 
-    @Override
-    public boolean func_233680_b_(LivingEntity p_233680_1_) {
-
-        if (!EntityPredicates.CAN_HOSTILE_AI_TARGET.test(p_233680_1_)) {
+    public boolean isAngryAt(LivingEntity entity) {
+        if (!entity.canBeSeenAsEnemy()) {
             return false;
-        }
-
-        else {
-            return p_233680_1_.getType() == EntityType.PLAYER && this.func_241357_a_(p_233680_1_.world) || p_233680_1_.getUniqueID().equals(this.getAngerTarget());
+        } else {
+            return entity.getType() == EntityType.PLAYER && this.isAngryAtAllPlayers(entity.level()) || entity.getUUID().equals(this.getPersistentAngerTarget());
         }
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_PILLAGER_AMBIENT;
+        return SoundEvents.PILLAGER_AMBIENT;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return SoundEvents.ENTITY_PILLAGER_HURT;
+        return SoundEvents.PILLAGER_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_PILLAGER_DEATH;
+        return SoundEvents.PILLAGER_DEATH;
     }
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(SoundEvents.ENTITY_ZOMBIE_STEP, 0.15F, 1);
+        this.playSound(SoundEvents.ZOMBIE_STEP, 0.15F, 1);
     }
 
     @Override
-    protected int getExperiencePoints(PlayerEntity player) {
+    protected int getExperienceReward() {
         return 40;
     }
 
     @Override
-    public boolean canDespawn(double distanceToClosestPlayer) {
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
         return false;
     }
 }
