@@ -26,9 +26,9 @@ public class ButtonRect extends Button {
 
     public void setPosition (int x, int y) {
         rect.x = x;
-        this.x = x;
+        this.setX(x);
         rect.y = y;
-        this.y = y;
+        this.setY(y);
     }
 
     @Override

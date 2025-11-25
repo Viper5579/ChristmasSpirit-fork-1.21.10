@@ -64,14 +64,14 @@ public abstract class ContainerScreenBase<T extends ContainerBase> extends Abstr
      * Used to determine the left of the GUI.
      */
     public int getScreenX () {
-        return (this.width - getGuiSizeX()) / 2;
+        return this.leftPos;
     }
 
     /**
      * Used to determine the top of the GUI.
      */
     public int getScreenY () {
-        return (this.height - getGuiSizeY()) / 2;
+        return this.topPos;
     }
 
     /**
