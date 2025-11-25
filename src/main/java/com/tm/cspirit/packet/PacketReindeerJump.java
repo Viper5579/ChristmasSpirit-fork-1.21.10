@@ -3,7 +3,7 @@ package com.tm.cspirit.packet;
 import com.tm.cspirit.entity.EntityReindeer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
