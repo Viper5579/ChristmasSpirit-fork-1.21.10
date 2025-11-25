@@ -1,29 +1,29 @@
 package com.tm.cspirit.client.gui.base;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.tm.cspirit.inventory.base.ContainerBase;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import com.tm.cspirit.util.helper.ScreenHelper;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
-public abstract class ContainerScreenBase<T extends ContainerBase> extends ContainerScreen<Container> {
+public abstract class ContainerScreenBase<T extends ContainerBase> extends AbstractContainerScreen<AbstractContainerMenu> {
 
     protected static final int TEXT_COLOR_GRAY = 0x555555;
 
-    protected final PlayerInventory playerInventory;
-    protected final PlayerEntity player;
-    private final Container container;
+    protected final Inventory playerInventory;
+    protected final Player player;
+    private final AbstractContainerMenu container;
 
-    protected ContainerScreenBase (Container container, PlayerInventory playerInventory, ITextComponent title) {
+    protected ContainerScreenBase(AbstractContainerMenu container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
-        this.guiLeft = 0;
-        this.guiTop = 0;
-        this.xSize = getGuiSizeX();
-        this.ySize = getGuiSizeY();
+        this.leftPos = 0;
+        this.topPos = 0;
+        this.imageWidth = getGuiSizeX();
+        this.imageHeight = getGuiSizeY();
         this.container = container;
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
@@ -37,12 +37,12 @@ public abstract class ContainerScreenBase<T extends ContainerBase> extends Conta
     /**
      * Used to render anything in the background layer.
      */
-    protected abstract void drawGuiBackground (MatrixStack matrix, int mouseX, int mouseY);
+    protected abstract void drawGuiBackground (PoseStack matrix, int mouseX, int mouseY);
 
     /**
      * Used to render anything in the foreground layer.
      */
-    protected abstract void drawGuiForeground (MatrixStack matrix, int mouseX, int mouseY);
+    protected abstract void drawGuiForeground (PoseStack matrix, int mouseX, int mouseY);
 
     /**
      * Used to determine the width of the GUI.
@@ -93,7 +93,7 @@ public abstract class ContainerScreenBase<T extends ContainerBase> extends Conta
      * The base render method. Handles ALL rendering.
      */
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 
         renderBackground(matrixStack);
 
@@ -101,11 +101,11 @@ public abstract class ContainerScreenBase<T extends ContainerBase> extends Conta
 
         drawGuiForeground(matrixStack, mouseX, mouseY);
 
-        renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
 
         ScreenHelper.bindTexture(getGuiTextureName());
         ScreenHelper.drawRect(getScreenX(), getScreenY(), 0, 0, 0, getGuiSizeX(), getGuiSizeY());

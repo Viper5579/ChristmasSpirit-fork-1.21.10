@@ -1,34 +1,33 @@
 package com.tm.cspirit.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.extensions.IForgeBlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShapes;
 
 import java.util.List;
 
 public class Location {
 
-    public final World world;
+    public final Level world;
     public int x, y, z;
     private BlockPos blockPos;
 
-    public Location(World world, BlockPos pos) {
+    public Location(Level world, BlockPos pos) {
         this(world, pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public Location(World world, int x, int y, int z) {
+    public Location(Level world, int x, int y, int z) {
 
         this.world = world;
         this.x = x;
@@ -38,12 +37,12 @@ public class Location {
         blockPos = new BlockPos(x, y, z);
     }
 
-    public Location(TileEntity tileEntity) {
-        this(tileEntity.getWorld(), tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ());
+    public Location(BlockEntity tileEntity) {
+        this(tileEntity.getLevel(), tileEntity.getBlockPos().getX(), tileEntity.getBlockPos().getY(), tileEntity.getBlockPos().getZ());
     }
 
     public Location(Entity entity) {
-        this(entity.world, entity.getPosition().getX(), entity.getPosition().getY(), entity.getPosition().getZ());
+        this(entity.level(), entity.blockPosition().getX(), entity.blockPosition().getY(), entity.blockPosition().getZ());
     }
 
     public Location(Location location, Direction dir) {
@@ -53,18 +52,18 @@ public class Location {
     public Location(Location location, Direction dir, int distance) {
 
         this.world = location.world;
-        this.x = location.x + (dir.getXOffset() * distance);
-        this.y = location.y + (dir.getYOffset() * distance);
-        this.z = location.z + (dir.getZOffset() * distance);
+        this.x = location.x + (dir.getStepX() * distance);
+        this.y = location.y + (dir.getStepY() * distance);
+        this.z = location.z + (dir.getStepZ() * distance);
 
         blockPos = new BlockPos(x, y, z);
     }
 
     public Location translate (Direction dir, int distance) {
 
-        this.x += (dir.getXOffset() * distance);
-        this.y += (dir.getYOffset() * distance);
-        this.z += (dir.getZOffset() * distance);
+        this.x += (dir.getStepX() * distance);
+        this.y += (dir.getStepY() * distance);
+        this.z += (dir.getStepZ() * distance);
         blockPos = new BlockPos(x, y, z);
 
         return this;
@@ -87,22 +86,13 @@ public class Location {
         return blockPos;
     }
 
-    public IForgeBlockState getForgeBlockState () {
+    public BlockState getBlockState () {
 
         if (getBlockPos() == null) {
             return null;
         }
 
         return world.getBlockState(getBlockPos());
-    }
-
-    public BlockState getBlockState () {
-
-        if (getForgeBlockState() == null) {
-            return null;
-        }
-
-        return getForgeBlockState().getBlockState();
     }
 
     public Block getBlock () {
@@ -114,16 +104,16 @@ public class Location {
         return getBlockState().getBlock();
     }
 
-    public List<ItemStack> getDrops (PlayerEntity player, ItemStack heldStack) {
-        return Block.getDrops(getBlockState(), (ServerWorld) world, getBlockPos(), null, player, heldStack);
+    public List<ItemStack> getDrops (Player player, ItemStack heldStack) {
+        return getBlock().getDrops(getBlockState(), (net.minecraft.server.level.ServerLevel) world, getBlockPos(), null, player, heldStack);
     }
 
     public int getLightValue () {
-        return world.getLight(getBlockPos());
+        return world.getMaxLocalRawBrightness(getBlockPos());
     }
 
-    public TileEntity getTileEntity () {
-        return world.getTileEntity(getBlockPos());
+    public BlockEntity getTileEntity () {
+        return world.getBlockEntity(getBlockPos());
     }
 
     public double getDistance (Location location) {
@@ -136,17 +126,17 @@ public class Location {
     }
 
     public void setBlock (Block block) {
-        world.setBlockState(getBlockPos(), block.getDefaultState());
+        world.setBlock(getBlockPos(), block.defaultBlockState(), 3);
     }
 
     public void setBlock (BlockState state) {
-        world.setBlockState(getBlockPos(), state.getBlock().getDefaultState());
-        world.setBlockState(getBlockPos(), state);
+        world.setBlock(getBlockPos(), state.getBlock().defaultBlockState(), 3);
+        world.setBlock(getBlockPos(), state, 3);
     }
 
-    public void setBlock (BlockState state, PlayerEntity placer) {
-        world.setBlockState(getBlockPos(), state, 2);
-        state.getBlock().onBlockPlacedBy(world, getBlockPos(), state, placer, new ItemStack(state.getBlock()));
+    public void setBlock (BlockState state, Player placer) {
+        world.setBlock(getBlockPos(), state, 2);
+        state.getBlock().setPlacedBy(world, getBlockPos(), state, placer, new ItemStack(state.getBlock()));
     }
 
     public void setBlockToAir () {
@@ -162,10 +152,11 @@ public class Location {
     }
 
     public boolean doesBlockHaveCollision () {
-        return getBlock().getCollisionShape(getBlockState(), world, getBlockPos(), ISelectionContext.dummy()) != VoxelShapes.empty();
+        VoxelShape shape = getBlock().getCollisionShape(getBlockState(), world, getBlockPos(), CollisionContext.empty());
+        return shape != null && shape != VoxelShapes.empty();
     }
 
-    public static Location fromNBT(World world, CompoundNBT nbt) {
+    public static Location fromNBT(Level world, CompoundTag nbt) {
 
         int x = nbt.getInt("locX");
         int y = nbt.getInt("locY");
@@ -180,7 +171,7 @@ public class Location {
         return null;
     }
 
-    public void toNBT(CompoundNBT nbt) {
+    public void toNBT(CompoundTag nbt) {
         nbt.putInt("locX", z);
         nbt.putInt("locY", y);
         nbt.putInt("locZ", z);
@@ -199,6 +190,6 @@ public class Location {
 
     @Override
     public String toString () {
-        return "[" + x + ", " + y + ", " + z + "]";
+        return "Location[" + x + "," + y + "," + z + "]";
     }
 }

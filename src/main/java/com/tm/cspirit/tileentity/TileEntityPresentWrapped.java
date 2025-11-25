@@ -4,19 +4,19 @@ import com.tm.cspirit.init.InitTileEntityTypes;
 import com.tm.cspirit.inventory.ContainerPresentWrapped;
 import com.tm.cspirit.present.PresentConstructor;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.PlayerInventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.network.chat.Component;
 
 public class TileEntityPresentWrapped extends TileEntityInventoryBase {
 
     private PresentConstructor presentConstructor;
 
-    public TileEntityPresentWrapped () {
-        super(InitTileEntityTypes.PRESENT_WRAPPED.get());
+    public TileEntityPresentWrapped (BlockPos pos, BlockState state) {
+        super(InitTileEntityTypes.PRESENT_WRAPPED.get(), pos, state);
         presentConstructor = new PresentConstructor();
     }
 
@@ -29,8 +29,8 @@ public class TileEntityPresentWrapped extends TileEntityInventoryBase {
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent("Wrapped Present");
+    public Component getDisplayName() {
+        return Component.literal("Wrapped Present");
     }
 
     @Override
@@ -44,19 +44,19 @@ public class TileEntityPresentWrapped extends TileEntityInventoryBase {
     }
 
     @Override
-    public Container getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer (int windowId, PlayerInventory playerInv) {
         return new ContainerPresentWrapped(windowId, playerInv, this);
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
         presentConstructor = PresentConstructor.fromNBT(nbt);
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT nbt) {
+    protected void saveAdditional(CompoundTag nbt) {
         presentConstructor.toNBT(nbt);
-        return super.write(nbt);
+        super.saveAdditional(nbt);
     }
 }

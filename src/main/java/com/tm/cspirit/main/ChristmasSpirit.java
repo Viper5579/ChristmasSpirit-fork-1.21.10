@@ -16,6 +16,7 @@ import com.tm.cspirit.init.*;
 import com.tm.cspirit.packet.PacketReindeerJump;
 import com.tm.cspirit.packet.PacketWrapPresent;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +25,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -95,7 +95,7 @@ public class ChristmasSpirit {
         RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.SLEIGH.get(), RenderSleigh::new);
         RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.CHRISTMAS_TREE.get(), RenderChristmasTree::new);
 
-        ClientRegistry.bindTileEntityRenderer(InitTileEntityTypes.COOKIE_TRAY.get(), RenderCookieTray::new);
+        BlockEntityRenderers.register(InitTileEntityTypes.COOKIE_TRAY.get(), RenderCookieTray::new);
 
         MinecraftForge.EVENT_BUS.register(new SpawnEggRegisterEvent());
         MinecraftForge.EVENT_BUS.register(new ItemTooltipOverrideEvent());
