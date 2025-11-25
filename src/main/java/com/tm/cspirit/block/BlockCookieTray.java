@@ -6,33 +6,29 @@ import com.tm.cspirit.tileentity.TileEntityCookieTray;
 import com.tm.cspirit.tileentity.base.CSItemHandler;
 import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-
-import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockCookieTray extends BlockInventoryBase {
 
-    public static final VoxelShape SHAPE = Optional.of(Block.makeCuboidShape(2, 0, 2, 14, 1, 14)).get();
+    public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 1, 14);
 
     public BlockCookieTray() {
-        super(Properties.create(Material.IRON).hardnessAndResistance(0.5F).sound(SoundType.METAL).notSolid());
+        super(Properties.of().strength(0.5F).sound(SoundType.METAL).noOcclusion());
     }
 
-    public void takeNextCookie(World world, PlayerEntity player, CSItemHandler inv) {
+    public void takeNextCookie(Level world, Player player, CSItemHandler inv) {
 
         for (int i = 0; i < inv.getSlots(); i++) {
 
@@ -49,40 +45,39 @@ public class BlockCookieTray extends BlockInventoryBase {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
 
         if (!player.isCrouching()) {
 
             Location location = new Location(world, pos);
 
-            if (location.getTileEntity() instanceof TileEntityCookieTray) {
-                TileEntityCookieTray cookieTray = (TileEntityCookieTray) location.getTileEntity();
+            if (location.getTileEntity() instanceof TileEntityCookieTray cookieTray) {
                 takeNextCookie(world, player, cookieTray.getInventory());
             }
 
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        else return super.onBlockActivated(state, world, pos, player, hand, result);
+        else return super.useWithoutItem(state, world, pos, player, result);
     }
 
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return InitTileEntityTypes.COOKIE_TRAY.get().create();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return InitTileEntityTypes.COOKIE_TRAY.get().create(pos, state);
     }
 
     @Override
-    public VoxelShape getShape (BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public VoxelShape getCollisionShape (BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
         return true;
     }
 }

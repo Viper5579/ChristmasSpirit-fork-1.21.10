@@ -2,27 +2,25 @@ package com.tm.cspirit.block;
 
 import com.tm.cspirit.block.base.BlockInventoryBase;
 import com.tm.cspirit.init.InitTileEntityTypes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockPresentUnwrapped extends BlockInventoryBase {
 
     public BlockPresentUnwrapped() {
-        super(Block.Properties.create(Material.WOOL).hardnessAndResistance(0.5F).sound(SoundType.CLOTH).notSolid());
+        super(Properties.of().strength(0.5F).sound(SoundType.WOOL).noOcclusion());
     }
 
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return InitTileEntityTypes.PRESENT_UNWRAPPED.get().create();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return InitTileEntityTypes.PRESENT_UNWRAPPED.get().create(pos, state);
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
         return true;
     }
 }

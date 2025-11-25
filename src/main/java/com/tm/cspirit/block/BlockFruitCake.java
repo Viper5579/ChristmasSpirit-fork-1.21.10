@@ -2,83 +2,64 @@ package com.tm.cspirit.block;
 
 import com.tm.cspirit.item.base.IItemSpiritSupplier;
 import com.tm.cspirit.util.helper.EffectHelper;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CakeBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
 public class BlockFruitCake extends CakeBlock implements IItemSpiritSupplier {
 
     protected static final VoxelShape[] SHAPES = new VoxelShape[]{
-            Block.makeCuboidShape(1.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(3.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(5.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(7.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(9.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(11.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
-            Block.makeCuboidShape(13.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D)};
+            Block.box(1.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(3.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(5.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(7.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(9.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(11.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D),
+            Block.box(13.0D, 0.0D, 4.0D, 15.0D, 8.0D, 12.0D)};
 
     public BlockFruitCake() {
-        super(AbstractBlock.Properties.create(Material.CAKE).hardnessAndResistance(0.5F).sound(SoundType.CLOTH));
+        super(Properties.of().strength(0.5F).sound(SoundType.WOOL));
     }
 
     @Override
-    public void addInformation(ItemStack stack, IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        tooltip.add(new TranslationTextComponent("hunger.icon.4"));
-        tooltip.add(new TranslationTextComponent("saturation.icon.0.3"));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("hunger.icon.4"));
+        tooltip.add(Component.translatable("saturation.icon.0.3"));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-
-        if (worldIn.isRemote) {
-
-            ItemStack itemstack = player.getHeldItem(handIn);
-
-            if (this.eatSlice(worldIn, pos, state, player).isSuccessOrConsume()) {
-                return ActionResultType.SUCCESS;
-            }
-
-            if (itemstack.isEmpty()) {
-                return ActionResultType.CONSUME;
-            }
-        }
-
-        return this.eatSlice(worldIn, pos, state, player);
-    }
-
-    private ActionResultType eatSlice(IWorld world, BlockPos pos, BlockState state, PlayerEntity player) {
-
-        player.addStat(Stats.EAT_CAKE_SLICE);
-        if (player.canEat(false)) player.getFoodStats().addStats(4, 0.3F);
+    protected InteractionResult eat(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
+        player.awardStat(Stats.EAT_CAKE_SLICE);
+        if (player.canEat(false)) player.getFoodData().eat(4, 0.3F);
         EffectHelper.giveHolidaySpiritStackEffect(player, 3);
 
-        int i = state.get(BITES);
+        int i = state.getValue(BITES);
 
-        if (i < 6) world.setBlockState(pos, state.with(BITES, i + 1), 3);
+        if (i < 6) world.setBlock(pos, state.setValue(BITES, i + 1), 3);
         else world.removeBlock(pos, false);
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return SHAPES[state.get(BITES)];
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return SHAPES[state.getValue(BITES)];
     }
 
     @Override
