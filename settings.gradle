@@ -11,9 +11,10 @@ pluginManagement {
 }
 
 // Also apply to all dependency resolution
+// Note: We don't set repositoriesMode to PREFER_SETTINGS because ForgeGradle needs
+// to add its own repositories. Instead, repositories are declared in both
+// settings.gradle (for plugin dependencies) and build.gradle (for project dependencies).
 dependencyResolutionManagement {
-    // Don't set repositoriesMode - allow ForgeGradle to add its own repositories
-    // repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         // Local repository for LWJGL Apple Silicon fix - MUST BE FIRST
         maven {
