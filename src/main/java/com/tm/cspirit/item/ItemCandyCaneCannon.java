@@ -4,124 +4,91 @@ import com.tm.cspirit.entity.EntityCandyCaneProjectile;
 import com.tm.cspirit.init.InitItems;
 import com.tm.cspirit.item.base.ItemBase;
 import com.tm.cspirit.main.CSConfig;
-import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 public class ItemCandyCaneCannon extends ItemBase {
 
     private static final int MAX_CHARGE_TIME = 20;
 
-    private int chargeTime;
-
     public ItemCandyCaneCannon() {
-        super(new Properties().group(ChristmasSpirit.TAB_MAIN).maxStackSize(1));
-    }
-
-    private boolean isReady(ItemStack stack) {
-        return stack.getUseDuration() >= MAX_CHARGE_TIME;
+        super(new Properties().stacksTo(1));
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-
-        if (entity instanceof PlayerEntity) {
-
-            PlayerEntity player = (PlayerEntity) entity;
-
-            if (getUseDuration(stack) - player.getItemInUseCount() == MAX_CHARGE_TIME) {
-                player.playSound(SoundEvents.UI_BUTTON_CLICK, 1, 1);
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int itemSlot, boolean isSelected) {
+        if (entity instanceof Player player) {
+            if (getUseDuration(stack, entity) - player.getUseItemRemainingTicks() == MAX_CHARGE_TIME) {
+                player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
             }
         }
-
         super.inventoryTick(stack, world, entity, itemSlot, isSelected);
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
-
-        if (hand == Hand.MAIN_HAND) {
-
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
+        if (hand == InteractionHand.MAIN_HAND) {
             ItemStack candyCaneStack = ItemStack.EMPTY;
-
-            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-
-                ItemStack stackInSlot = player.inventory.getStackInSlot(i);
-
+            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                ItemStack stackInSlot = player.getInventory().getItem(i);
                 if (stackInSlot.getItem() instanceof ItemCandyCane) {
                     candyCaneStack = stackInSlot;
                     break;
                 }
             }
-
             if (!candyCaneStack.isEmpty()) {
-                player.setActiveHand(hand);
+                player.startUsingItem(hand);
             }
         }
-
-        return new ActionResult<>(ActionResultType.FAIL, itemstack);
+        return InteractionResultHolder.fail(itemstack);
     }
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World world, LivingEntity entityLiving, int timeLeft) {
-
-        if (entityLiving instanceof PlayerEntity) {
-
-            PlayerEntity player = (PlayerEntity) entityLiving;
-
-            if (getUseDuration(stack) - timeLeft >= MAX_CHARGE_TIME) {
-
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity entityLiving, int timeLeft) {
+        if (entityLiving instanceof Player player) {
+            if (getUseDuration(stack, entityLiving) - timeLeft >= MAX_CHARGE_TIME) {
                 ItemStack candyCaneStack = ItemStack.EMPTY;
-
-                for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-
-                    ItemStack stackInSlot = player.inventory.getStackInSlot(i);
-
+                for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                    ItemStack stackInSlot = player.getInventory().getItem(i);
                     if (stackInSlot.getItem() instanceof ItemCandyCane) {
                         candyCaneStack = stackInSlot;
                         break;
                     }
                 }
-
                 if (!candyCaneStack.isEmpty()) {
-
                     byte candyType = 0;
-
                     if (candyCaneStack.getItem() == InitItems.CANDY_CANE_GREEN.get()) {
                         candyType = 1;
                     } else if (candyCaneStack.getItem() == InitItems.CANDY_CANE_BLUE.get()) {
                         candyType = 2;
                     }
-
                     EntityCandyCaneProjectile entity = new EntityCandyCaneProjectile(world, player, candyType);
                     entity.setIsCritical(true);
-                    entity.func_234612_a_(player, player.rotationPitch, player.rotationYaw, 0.0F, 3, 1.0F);
-                    world.addEntity(entity);
+                    entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3, 1.0F);
+                    world.addFreshEntity(entity);
                     candyCaneStack.shrink(1);
-
-                    player.playSound(SoundEvents.ITEM_TRIDENT_THROW, 1, 1);
-                    player.playSound(SoundEvents.ITEM_CROSSBOW_SHOOT, 1, 1);
+                    player.playSound(SoundEvents.TRIDENT_THROW, 1, 1);
+                    player.playSound(SoundEvents.CROSSBOW_SHOOT, 1, 1);
                 }
             }
         }
     }
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 72000;
     }
 
