@@ -1,6 +1,5 @@
 package com.tm.cspirit.client.gui;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.tm.cspirit.client.gui.base.ButtonRect;
 import com.tm.cspirit.client.gui.base.ContainerScreenBase;
 import com.tm.cspirit.client.gui.base.TextFieldRect;
@@ -13,9 +12,11 @@ import com.tm.cspirit.present.PresentStyle;
 import com.tm.cspirit.tileentity.TileEntityPresentUnwrapped;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.ChatFormatting;
+import com.mojang.blaze3d.platform.InputConstants;
+
+public class ScreenPresentUnwrapped extends ContainerScreenBase<ContainerPresentUnwrapped> {
 
     private final TileEntityPresentUnwrapped present;
     private final PresentConstructor constructor;
@@ -74,10 +75,10 @@ import net.minecraft.world.entity.player.Inventory;
     private boolean isPresentReady() {
 
         boolean notEmpty = !present.getInventory().getStackInSlot(0).isEmpty();
-        boolean hasToPlayerName = !toPlayerNameField.getText().isEmpty();
+        boolean hasToPlayerName = !toPlayerNameField.getValue().isEmpty();
 
-        if (!notEmpty) present.getUnitName(player).printMessage(TextColor.fromLegacyFormat(ChatFormatting.RED), "The present is empty!");
-        if (!hasToPlayerName) present.getUnitName(player).printMessage(TextColor.fromLegacyFormat(ChatFormatting.RED), "The present needs a player to go to!");
+        if (!notEmpty) present.getUnitName(player).printMessage(ChatFormatting.RED, "The present is empty!");
+        if (!hasToPlayerName) present.getUnitName(player).printMessage(ChatFormatting.RED, "The present needs a player to go to!");
 
         return notEmpty && hasToPlayerName;
     }
@@ -87,20 +88,20 @@ import net.minecraft.world.entity.player.Inventory;
         if (isPresentReady()) {
             onClose();
             constructor.setFromPlayerName(player.getDisplayName().getString());
-            constructor.setToPlayerName(toPlayerNameField.getText());
+            constructor.setToPlayerName(toPlayerNameField.getValue());
             ChristmasSpirit.network.sendToServer(new PacketWrapPresent(constructor, present.getPos()));
             player.playSound(InitSounds.PRESENT_WRAP.get(), 1, 1);
         }
     }
 
     @Override
-    protected void drawGuiBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        toPlayerNameField.render(guiGraphics, mouseX, mouseY, 0);
+    protected void drawGuiBackground(GuiGraphics graphics, int mouseX, int mouseY) {
+        toPlayerNameField.render(graphics, mouseX, mouseY, 0);
     }
 
     @Override
-    protected void drawGuiForeground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (minecraft != null) guiGraphics.drawString(minecraft.font, "To:", getScreenX() + 24, getScreenY() + 49, TEXT_COLOR_GRAY, false);
+    protected void drawGuiForeground(GuiGraphics graphics, int mouseX, int mouseY) {
+        if (minecraft != null) graphics.drawString(minecraft.font, "To:", getScreenX() + 24, getScreenY() + 49, TEXT_COLOR_GRAY, false);
     }
 
     @Override

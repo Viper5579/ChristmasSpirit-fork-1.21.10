@@ -2,22 +2,23 @@ package com.tm.cspirit.client.gui.base;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tm.cspirit.inventory.base.ContainerBase;
+import com.tm.cspirit.main.CSReference;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Menu;
 
-public abstract class ContainerScreenBase<T extends Menu> extends AbstractContainerScreen<T> {
+public abstract class ContainerScreenBase<T extends ContainerBase> extends AbstractContainerScreen<T> {
 
     protected static final int TEXT_COLOR_GRAY = 0x555555;
 
     protected final Inventory playerInventory;
     protected final Player player;
-    private final Menu container;
+    private final T container;
 
     protected ContainerScreenBase (T container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
@@ -38,12 +39,12 @@ public abstract class ContainerScreenBase<T extends Menu> extends AbstractContai
     /**
      * Used to render anything in the background layer.
      */
-    protected abstract void drawGuiBackground (GuiGraphics guiGraphics, int mouseX, int mouseY);
+    protected abstract void drawGuiBackground (GuiGraphics graphics, int mouseX, int mouseY);
 
     /**
      * Used to render anything in the foreground layer.
      */
-    protected abstract void drawGuiForeground (GuiGraphics guiGraphics, int mouseX, int mouseY);
+    protected abstract void drawGuiForeground (GuiGraphics graphics, int mouseX, int mouseY);
 
     /**
      * Used to determine the width of the GUI.
@@ -94,25 +95,21 @@ public abstract class ContainerScreenBase<T extends Menu> extends AbstractContai
      * The base render method. Handles ALL rendering.
      */
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-
-        renderBackground(guiGraphics);
-
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-
-        drawGuiForeground(guiGraphics, mouseX, mouseY);
-
-        renderTooltip(guiGraphics, mouseX, mouseY);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        drawGuiForeground(graphics, mouseX, mouseY);
+        renderTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
+        ResourceLocation texture = new ResourceLocation(CSReference.MOD_ID + ":textures/gui/" + getGuiTextureName() + ".png");
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        RenderSystem.setShaderTexture(0, texture);
+        graphics.blit(texture, getScreenX(), getScreenY(), 0, 0, getGuiSizeX(), getGuiSizeY());
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        ResourceLocation texture = new ResourceLocation(com.tm.cspirit.main.CSReference.MOD_ID, "textures/gui/" + getGuiTextureName() + ".png");
-        guiGraphics.blit(texture, getScreenX(), getScreenY(), 0, 0, getGuiSizeX(), getGuiSizeY());
-
-        drawGuiBackground(guiGraphics, mouseX, mouseY);
+        drawGuiBackground(graphics, mouseX, mouseY);
     }
 }
