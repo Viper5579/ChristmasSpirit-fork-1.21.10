@@ -56,6 +56,7 @@ public class ChristmasSpirit {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CSConfig.spec, CSReference.CONFIG_DIR + "/ChristmasSpirit.toml");
         DataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
+        InitArmorMaterials.ARMOR_MATERIALS.register(MOD_EVENT_BUS);
         InitSounds.SOUNDS.register(MOD_EVENT_BUS);
         InitEffects.POTION_TYPES.register(MOD_EVENT_BUS);
         InitTileEntityTypes.TILE_ENTITY_TYPES.register(MOD_EVENT_BUS);
