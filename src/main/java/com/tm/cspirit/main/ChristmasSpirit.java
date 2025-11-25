@@ -52,9 +52,10 @@ public class ChristmasSpirit {
         MOD_EVENT_BUS.addListener(this::onCommonSetup);
         MOD_EVENT_BUS.addListener(this::onEntityAttributeCreation);
         MOD_EVENT_BUS.addListener(this::onLoadComplete);
+        MOD_EVENT_BUS.addListener(this::onEntityAttributeCreation);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CSConfig.spec, CSReference.CONFIG_DIR + "/ChristmasSpirit.toml");
-        DataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
+        EntityDataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
         InitArmorMaterials.ARMOR_MATERIALS.register(MOD_EVENT_BUS);
         InitSounds.SOUNDS.register(MOD_EVENT_BUS);
         InitEffects.POTION_TYPES.register(MOD_EVENT_BUS);
