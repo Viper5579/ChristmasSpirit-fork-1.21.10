@@ -15,12 +15,8 @@ import com.tm.cspirit.event.SpawnEggRegisterEvent;
 import com.tm.cspirit.init.*;
 import com.tm.cspirit.packet.PacketReindeerJump;
 import com.tm.cspirit.packet.PacketWrapPresent;
-import com.tm.cspirit.tab.CSTabBaking;
-import com.tm.cspirit.tab.CSTabDecoration;
-import com.tm.cspirit.tab.CSTabMain;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -49,10 +45,6 @@ public class ChristmasSpirit {
     public static IEventBus MOD_EVENT_BUS;
     public static SimpleChannel network;
 
-    public static final ItemGroup TAB_MAIN = new CSTabMain();
-    public static final ItemGroup TAB_DECORATION = new CSTabDecoration();
-    public static final ItemGroup TAB_BAKING = new CSTabBaking();
-
     public ChristmasSpirit() {
 
         instance = this;
@@ -69,6 +61,7 @@ public class ChristmasSpirit {
         InitTileEntityTypes.TILE_ENTITY_TYPES.register(MOD_EVENT_BUS);
         InitContainerTypes.CONTAINER_TYPES.register(MOD_EVENT_BUS);
         InitEntityTypes.ENTITY_TYPES.register(MOD_EVENT_BUS);
+        InitCreativeTabs.CREATIVE_MODE_TABS.register(MOD_EVENT_BUS);
         InitItems.init();
         DailyPresentDataFile.init();
         SantaGiftListFile.init();
