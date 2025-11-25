@@ -9,6 +9,7 @@ import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class InitContainerTypes {
 

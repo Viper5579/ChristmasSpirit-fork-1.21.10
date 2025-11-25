@@ -54,21 +54,21 @@ public class ContainerBase extends AbstractContainerMenu {
     /**
      * Gets the new inventory's slot amount.
      */
-    private int getTileEntitySlotAmount () {
+    private int getTileEntitySlotAmount() {
         return isItemContainer ? size : tileEntity.getSizeInventory();
     }
 
     /**
      * Used to add the Player's inventory.
      */
-    protected void addPlayerInv (int x, int y) {
+    protected void addPlayerInv(int x, int y) {
         addStorageInv(playerInventory, 9, x, y, 3);
     }
 
     /**
      * Used to add the Player's hotbar.
      */
-    protected void addPlayerHotbar (int x, int y) {
+    protected void addPlayerHotbar(int x, int y) {
         addStorageInv(playerInventory, 0, x, y, 1);
     }
 
@@ -87,7 +87,7 @@ public class ContainerBase extends AbstractContainerMenu {
     /**
      * Used to add the storage slots of a Tile Entity.
      */
-    protected void addTileEntityStorageInv (CSItemHandler inv, int idOffset, int x, int y, int height) {
+    protected void addTileEntityStorageInv(CSItemHandler inv, int idOffset, int x, int y, int height) {
 
         int id = idOffset;
         for (int i = 0; i < height; i++) {
@@ -109,7 +109,7 @@ public class ContainerBase extends AbstractContainerMenu {
     /**
      * Checks if the given merge is possible.
      */
-    private boolean mergeIfPossible (Slot slot, ItemStack is, ItemStack is2, int id, int maxId) {
+    private boolean mergeIfPossible(Slot slot, ItemStack is, ItemStack is2, int id, int maxId) {
 
         if (!this.moveItemStackTo(is, id, maxId, false) || is.getCount() > slot.getMaxStackSize(is)) {
             return true;
@@ -122,7 +122,7 @@ public class ContainerBase extends AbstractContainerMenu {
     /**
      * Handles Transfers: Player Inventory <-> Hotbar.
      */
-    private boolean mergeInvHotbarIfPossible (Slot slot, ItemStack is, ItemStack is2, int id) {
+    private boolean mergeInvHotbarIfPossible(Slot slot, ItemStack is, ItemStack is2, int id) {
 
         //Transfers: Player Inventory -> Hotbar.
         if (id < 27) {
