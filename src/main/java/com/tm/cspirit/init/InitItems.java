@@ -11,7 +11,7 @@ import com.tm.cspirit.item.tier.CSArmorTiers;
 import com.tm.cspirit.main.CSReference;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -94,19 +94,19 @@ public class InitItems {
     public static final RegistryObject<Item> SODA_SPRITE_CRANBERRY =       regItem("soda_sprite_cranberry", () -> new ItemSoda(8, 0.8F));
 
     //WEARABLES
-    public static final RegistryObject<Item> CHRISTMAS_HAT =               regItem("christmas_hat", () -> new ItemArmorBase(CSArmorTiers.CHRISTMAS_HAT, EquipmentSlot.HEAD));
-    public static final RegistryObject<Item> BEANIE_BLACK =                regItem("beanie_black", () -> new ItemArmorBase(CSArmorTiers.BEANIE_BLACK, EquipmentSlot.HEAD));
-    public static final RegistryObject<Item> BEANIE_RED =                  regItem("beanie_red", () -> new ItemArmorBase(CSArmorTiers.BEANIE_RED, EquipmentSlot.HEAD));
-    public static final RegistryObject<Item> BEANIE_GREEN =                regItem("beanie_green", () -> new ItemArmorBase(CSArmorTiers.BEANIE_GREEN, EquipmentSlot.HEAD));
+    public static final RegistryObject<Item> CHRISTMAS_HAT =               regItem("christmas_hat", () -> new ItemArmorBase(CSArmorTiers.CHRISTMAS_HAT, ArmorItem.Type.HELMET));
+    public static final RegistryObject<Item> BEANIE_BLACK =                regItem("beanie_black", () -> new ItemArmorBase(CSArmorTiers.BEANIE_BLACK, ArmorItem.Type.HELMET));
+    public static final RegistryObject<Item> BEANIE_RED =                  regItem("beanie_red", () -> new ItemArmorBase(CSArmorTiers.BEANIE_RED, ArmorItem.Type.HELMET));
+    public static final RegistryObject<Item> BEANIE_GREEN =                regItem("beanie_green", () -> new ItemArmorBase(CSArmorTiers.BEANIE_GREEN, ArmorItem.Type.HELMET));
 
-    public static final RegistryObject<Item> SWEATER_BLACK =               regItem("sweater_black", () -> new ItemArmorBase(CSArmorTiers.SWEATER_BLACK, EquipmentSlot.CHEST));
-    public static final RegistryObject<Item> SWEATER_RED =                 regItem("sweater_red", () -> new ItemArmorBase(CSArmorTiers.SWEATER_RED, EquipmentSlot.CHEST));
-    public static final RegistryObject<Item> SWEATER_GREEN =               regItem("sweater_green", () -> new ItemArmorBase(CSArmorTiers.SWEATER_GREEN, EquipmentSlot.CHEST));
+    public static final RegistryObject<Item> SWEATER_BLACK =               regItem("sweater_black", () -> new ItemArmorBase(CSArmorTiers.SWEATER_BLACK, ArmorItem.Type.CHESTPLATE));
+    public static final RegistryObject<Item> SWEATER_RED =                 regItem("sweater_red", () -> new ItemArmorBase(CSArmorTiers.SWEATER_RED, ArmorItem.Type.CHESTPLATE));
+    public static final RegistryObject<Item> SWEATER_GREEN =               regItem("sweater_green", () -> new ItemArmorBase(CSArmorTiers.SWEATER_GREEN, ArmorItem.Type.CHESTPLATE));
 
-    public static final RegistryObject<Item> WINTER_JEANS =                regItem("winter_jeans", () -> new ItemArmorBase(CSArmorTiers.WINTER_JEANS, EquipmentSlot.LEGS));
+    public static final RegistryObject<Item> WINTER_JEANS =                regItem("winter_jeans", () -> new ItemArmorBase(CSArmorTiers.WINTER_JEANS, ArmorItem.Type.LEGGINGS));
 
-    public static final RegistryObject<Item> WINTER_BOOTS =                regItem("winter_boots", () -> new ItemArmorBase(CSArmorTiers.WINTER_BOOTS, EquipmentSlot.FEET));
-    public static final RegistryObject<Item> ICE_SKATES =                  regItem("ice_skates", () -> new ItemArmorBase(CSArmorTiers.ICE_SKATES, EquipmentSlot.FEET));
+    public static final RegistryObject<Item> WINTER_BOOTS =                regItem("winter_boots", () -> new ItemArmorBase(CSArmorTiers.WINTER_BOOTS, ArmorItem.Type.BOOTS));
+    public static final RegistryObject<Item> ICE_SKATES =                  regItem("ice_skates", () -> new ItemArmorBase(CSArmorTiers.ICE_SKATES, ArmorItem.Type.BOOTS));
 
     //DISCS
     public static final RegistryObject<Item> DISC_WISHBACKGROUND =         regItem("disc_wishbackground", () -> new ItemDisc(InitSounds.WISHBACKGROUND));
@@ -126,10 +126,10 @@ public class InitItems {
     public static final RegistryObject<Item> LUMP_OF_COAL =                regItem("lump_of_coal", () -> new ItemBase().addTag("naughty"));
 
     public static final RegistryObject<Item> FROST_INGOT =                 regItem("frost_ingot", () -> new ItemBase().addTag("naughty"));
-    public static final RegistryObject<Item> FROST_HELMET =                regItem("frost_helmet", () -> new ItemFrostArmor(EquipmentSlot.HEAD));
-    public static final RegistryObject<Item> FROST_CHESTPLATE =            regItem("frost_chestplate", () -> new ItemFrostArmor(EquipmentSlot.CHEST));
-    public static final RegistryObject<Item> FROST_LEGGINGS =              regItem("frost_leggings", () -> new ItemFrostArmor(EquipmentSlot.LEGS));
-    public static final RegistryObject<Item> FROST_BOOTS =                 regItem("frost_boots", () -> new ItemFrostArmor(EquipmentSlot.FEET));
+    public static final RegistryObject<Item> FROST_HELMET =                regItem("frost_helmet", () -> new ItemFrostArmor(ArmorItem.Type.HELMET));
+    public static final RegistryObject<Item> FROST_CHESTPLATE =            regItem("frost_chestplate", () -> new ItemFrostArmor(ArmorItem.Type.CHESTPLATE));
+    public static final RegistryObject<Item> FROST_LEGGINGS =              regItem("frost_leggings", () -> new ItemFrostArmor(ArmorItem.Type.LEGGINGS));
+    public static final RegistryObject<Item> FROST_BOOTS =                 regItem("frost_boots", () -> new ItemFrostArmor(ArmorItem.Type.BOOTS));
 
     public static final RegistryObject<Item> FROSTMOURNE =                 regItem("frostmourne", ItemFrostmourne::new);
 
