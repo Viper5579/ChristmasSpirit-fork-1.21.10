@@ -9,35 +9,32 @@ import com.tm.cspirit.util.helper.ItemHelper;
 import com.tm.cspirit.util.helper.PresentHelper;
 import com.tm.cspirit.util.helper.SoundHelper;
 import com.tm.cspirit.util.helper.TimeHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-
-import java.util.Optional;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockPresentWrapped extends BlockPresentUnwrapped {
 
-    public static final VoxelShape SHAPE = Optional.of(Block.makeCuboidShape(1, 0, 1, 15, 13, 15)).get();
+    public static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 13, 15);
 
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return InitTileEntityTypes.PRESENT_WRAPPED.get().create();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return InitTileEntityTypes.PRESENT_WRAPPED.get().create(pos, state);
     }
 
     public static void spawnPresent(Location location, PresentConstructor constructor, ItemStack giftStack) {
@@ -46,57 +43,54 @@ public class BlockPresentWrapped extends BlockPresentUnwrapped {
 
         constructor.toStack(stack);
 
-        CompoundNBT nbt = ItemHelper.getNBT(stack);
+        CompoundTag nbt = ItemHelper.getNBT(stack);
         NonNullList<ItemStack> giftList = NonNullList.create();
         giftList.add(0, giftStack);
-        ItemStackHelper.saveAllItems(nbt, giftList);
+        ContainerHelper.saveAllItems(nbt, giftList);
 
         ItemHelper.spawnStackAtLocation(location.world, location, stack);
     }
 
     @Override
-    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
+    public BlockState onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 
         Location location = new Location(world, pos);
-        TileEntity tileEntity = location.getTileEntity();
+        BlockEntity tileEntity = location.getTileEntity();
 
-        if (!world.isRemote) {
+        if (!world.isClientSide) {
 
-            if (tileEntity instanceof TileEntityPresentWrapped) {
-
-                TileEntityPresentWrapped present = (TileEntityPresentWrapped) tileEntity;
+            if (tileEntity instanceof TileEntityPresentWrapped present) {
 
                 boolean isAnybody = present.getConstructor().getToPlayerName().equalsIgnoreCase("anybody");
                 boolean isToPlayer = player.getDisplayName().getString().equalsIgnoreCase(present.getConstructor().getToPlayerName());
                 boolean isFromPlayer = player.getDisplayName().getString().equalsIgnoreCase(present.getConstructor().getFromPlayerName());
 
-                if (isAnybody|| isToPlayer || isFromPlayer || player.isCreative()) {
+                if (isAnybody || isToPlayer || isFromPlayer || player.isCreative()) {
                     spawnPresent(location, present.getConstructor(), present.getInventory().getStackInSlot(0));
                     location.setBlockToAir();
                 }
 
-                else present.getUnitName(player).printMessage(TextFormatting.RED, "This present belongs to " + present.getConstructor().getToPlayerName() + "! You can't pick it up!");
+                else present.getUnitName(player).printMessage(ChatFormatting.RED, "This present belongs to " + present.getConstructor().getToPlayerName() + "! You can't pick it up!");
             }
         }
 
-        return true;
+        return state;
     }
+
     @Override
-    public ActionResultType onBlockActivated (BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
 
         Location location = new Location(world, pos);
-        TileEntity tileEntity = location.getTileEntity();
+        BlockEntity tileEntity = location.getTileEntity();
 
-        if (!world.isRemote) {
+        if (!world.isClientSide) {
 
-            if (tileEntity instanceof TileEntityPresentWrapped) {
-
-                TileEntityPresentWrapped present = (TileEntityPresentWrapped) tileEntity;
+            if (tileEntity instanceof TileEntityPresentWrapped present) {
 
                 if (player.isCrouching()) {
-                    present.getUnitName(player).printMessage(TextFormatting.WHITE, "From: " + present.getConstructor().getFromPlayerName());
-                    present.getUnitName(player).printMessage(TextFormatting.WHITE, "To: " + present.getConstructor().getToPlayerName());
-                    present.getUnitName(player).printMessage(TextFormatting.WHITE, "Open on the " + TimeHelper.getFormattedDay(present.getConstructor().getActualDay()));
+                    present.getUnitName(player).printMessage(ChatFormatting.WHITE, "From: " + present.getConstructor().getFromPlayerName());
+                    present.getUnitName(player).printMessage(ChatFormatting.WHITE, "To: " + present.getConstructor().getToPlayerName());
+                    present.getUnitName(player).printMessage(ChatFormatting.WHITE, "Open on the " + TimeHelper.getFormattedDay(present.getConstructor().getActualDay()));
                 }
 
                 else if (player.getName().getString().equalsIgnoreCase(present.getConstructor().getToPlayerName()) || present.getConstructor().getToPlayerName().equalsIgnoreCase("anybody")) {
@@ -113,31 +107,31 @@ public class BlockPresentWrapped extends BlockPresentUnwrapped {
                         location.setBlockToAir();
 
                         player.playSound(InitSounds.PRESENT_UNWRAP.get(), 1, 1);
-                        SoundHelper.sendSoundToClient((ServerPlayerEntity) player, InitSounds.PRESENT_UNWRAP.get());
+                        SoundHelper.sendSoundToClient((ServerPlayer) player, InitSounds.PRESENT_UNWRAP.get());
                     }
 
                     else {
-                        present.getUnitName(player).printMessage(TextFormatting.RED, "You can't open this present yet!");
-                        present.getUnitName(player).printMessage(TextFormatting.RED, "You must wait until the " + TimeHelper.getFormattedDay(present.getConstructor().getActualDay()) + "!");
+                        present.getUnitName(player).printMessage(ChatFormatting.RED, "You can't open this present yet!");
+                        present.getUnitName(player).printMessage(ChatFormatting.RED, "You must wait until the " + TimeHelper.getFormattedDay(present.getConstructor().getActualDay()) + "!");
                     }
                 }
 
                 else {
-                    present.getUnitName(player).printMessage(TextFormatting.RED, "This present belongs to " + present.getConstructor().getToPlayerName() + "! You can't open it!");
+                    present.getUnitName(player).printMessage(ChatFormatting.RED, "This present belongs to " + present.getConstructor().getToPlayerName() + "! You can't open it!");
                 }
             }
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public VoxelShape getShape (BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public VoxelShape getCollisionShape (BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 }

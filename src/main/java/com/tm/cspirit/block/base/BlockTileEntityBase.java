@@ -1,13 +1,13 @@
 package com.tm.cspirit.block.base;
 
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * The base class for Blocks that have Containers
  */
-public abstract class BlockTileEntityBase extends ContainerBlock {
+public abstract class BlockTileEntityBase extends BaseEntityBlock {
 
     /**
      * @param properties The specific properties for the Block. (Creative Tab, hardness, material, etc.)
@@ -17,12 +17,7 @@ public abstract class BlockTileEntityBase extends ContainerBlock {
     }
 
     @Override
-    public boolean hasTileEntity (BlockState state) {
-        return true;
-    }
-
-    @Override
-    public BlockRenderType getRenderType (BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 }

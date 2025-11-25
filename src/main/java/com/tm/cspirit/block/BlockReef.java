@@ -1,63 +1,64 @@
 package com.tm.cspirit.block;
 
 import com.tm.cspirit.block.base.BlockBase;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-
-import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockReef extends BlockBase {
 
-    public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
-    public static final VoxelShape SHAPE_N = Optional.of(Block.makeCuboidShape(2, 2, 0, 14, 14, 1)).get();
-    public static final VoxelShape SHAPE_E = Optional.of(Block.makeCuboidShape(16, 2, 2, 15, 14, 14)).get();
-    public static final VoxelShape SHAPE_S = Optional.of(Block.makeCuboidShape(14, 2, 16, 2, 14, 15)).get();
-    public static final VoxelShape SHAPE_W = Optional.of(Block.makeCuboidShape(0, 2, 14, 1, 14, 2)).get();
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final VoxelShape SHAPE_N = Block.box(2, 2, 0, 14, 14, 1);
+    public static final VoxelShape SHAPE_E = Block.box(15, 2, 2, 16, 14, 14);
+    public static final VoxelShape SHAPE_S = Block.box(2, 2, 15, 14, 14, 16);
+    public static final VoxelShape SHAPE_W = Block.box(0, 2, 2, 1, 14, 14);
 
     public BlockReef() {
-        super(Properties.create(Material.PLANTS).hardnessAndResistance(0).sound(SoundType.PLANT).notSolid().variableOpacity().doesNotBlockMovement());
-        setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
+        super(Properties.of().strength(0).sound(SoundType.GRASS).noOcclusion());
+        registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     public VoxelShape getReefShape(BlockState state) {
-        switch (state.get(FACING)) {
-            case EAST: return SHAPE_E;
-            case SOUTH: return SHAPE_S;
-            case WEST: return SHAPE_W;
-            default: return SHAPE_N;
-        }
+        return switch (state.getValue(FACING)) {
+            case EAST -> SHAPE_E;
+            case SOUTH -> SHAPE_S;
+            case WEST -> SHAPE_W;
+            default -> SHAPE_N;
+        };
     }
 
     @Override
-    public VoxelShape getShape (BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return getReefShape(state);
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection());
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     @Override
-    public BlockRenderType getRenderType (BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
         return true;
     }
 }

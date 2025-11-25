@@ -1,24 +1,22 @@
 package com.tm.cspirit.item;
 
 import com.tm.cspirit.item.base.ItemBase;
-import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.extensions.IForgeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
-public class ItemCookieCutter extends ItemBase implements IForgeItem {
+public class ItemCookieCutter extends ItemBase {
 
     public ItemCookieCutter() {
-        super(new Item.Properties().group(ChristmasSpirit.TAB_BAKING).maxStackSize(1));
+        super(new Item.Properties().stacksTo(1).craftRemainder(null));
     }
 
     @Override
-    public ItemStack getContainerItem(ItemStack itemStack) {
-        return new ItemStack(getItem());
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        return new ItemStack(this);
     }
 
     @Override
-    public boolean hasContainerItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
         return true;
     }
 }

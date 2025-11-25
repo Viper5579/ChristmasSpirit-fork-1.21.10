@@ -15,14 +15,10 @@ import com.tm.cspirit.event.SpawnEggRegisterEvent;
 import com.tm.cspirit.init.*;
 import com.tm.cspirit.packet.PacketReindeerJump;
 import com.tm.cspirit.packet.PacketWrapPresent;
-import com.tm.cspirit.tab.CSTabBaking;
-import com.tm.cspirit.tab.CSTabDecoration;
-import com.tm.cspirit.tab.CSTabMain;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -49,10 +45,6 @@ public class ChristmasSpirit {
     public static IEventBus MOD_EVENT_BUS;
     public static SimpleChannel network;
 
-    public static final ItemGroup TAB_MAIN = new CSTabMain();
-    public static final ItemGroup TAB_DECORATION = new CSTabDecoration();
-    public static final ItemGroup TAB_BAKING = new CSTabBaking();
-
     public ChristmasSpirit() {
 
         instance = this;
@@ -64,11 +56,13 @@ public class ChristmasSpirit {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CSConfig.spec, CSReference.CONFIG_DIR + "/ChristmasSpirit.toml");
         DataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
+        InitArmorMaterials.ARMOR_MATERIALS.register(MOD_EVENT_BUS);
         InitSounds.SOUNDS.register(MOD_EVENT_BUS);
         InitEffects.POTION_TYPES.register(MOD_EVENT_BUS);
         InitTileEntityTypes.TILE_ENTITY_TYPES.register(MOD_EVENT_BUS);
         InitContainerTypes.CONTAINER_TYPES.register(MOD_EVENT_BUS);
         InitEntityTypes.ENTITY_TYPES.register(MOD_EVENT_BUS);
+        InitCreativeTabs.CREATIVE_MODE_TABS.register(MOD_EVENT_BUS);
         InitItems.init();
         DailyPresentDataFile.init();
         SantaGiftListFile.init();
@@ -92,8 +86,8 @@ public class ChristmasSpirit {
     private void onClientSetup(final FMLClientSetupEvent event) {
         InitRenderLayers.init();
 
-        ScreenManager.registerFactory(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
-        ScreenManager.registerFactory(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
+        MenuScreens.register(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
+        MenuScreens.register(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
 
         RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.JACK_FROST.get(), RenderJackFrost::new);
         RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.REINDEER.get(), RenderReindeer::new);

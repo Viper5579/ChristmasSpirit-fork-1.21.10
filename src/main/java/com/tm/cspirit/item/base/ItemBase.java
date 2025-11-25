@@ -1,8 +1,6 @@
 package com.tm.cspirit.item.base;
 
-import com.tm.cspirit.main.ChristmasSpirit;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.world.item.Item;
 
 public class ItemBase extends Item implements IItemTag {
 
@@ -12,12 +10,8 @@ public class ItemBase extends Item implements IItemTag {
         super(properties);
     }
 
-    public ItemBase(ItemGroup tab) {
-        super(new Item.Properties().group(tab));
-    }
-
     public ItemBase() {
-        super(new Item.Properties().group(ChristmasSpirit.TAB_MAIN));
+        super(new Item.Properties());
     }
 
     public ItemBase addTag(String tag) {
