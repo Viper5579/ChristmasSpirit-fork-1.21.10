@@ -16,11 +16,9 @@ import com.tm.cspirit.init.*;
 import com.tm.cspirit.packet.PacketReindeerJump;
 import com.tm.cspirit.packet.PacketWrapPresent;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -88,10 +86,8 @@ public class ChristmasSpirit {
         event.enqueueWork(InitFreezeWorld::init);
     }
 
-    @SubscribeEvent
-    public void onServerStarting(RegisterCommandsEvent event) {
-        CSCommandBase.register(event.getDispatcher());
-    }
+        MenuScreens.register(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
+        MenuScreens.register(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
 
     @Mod.EventBusSubscriber(modid = CSReference.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
