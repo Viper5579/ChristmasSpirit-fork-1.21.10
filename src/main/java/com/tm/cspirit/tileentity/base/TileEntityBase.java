@@ -1,86 +1,70 @@
 package com.tm.cspirit.tileentity.base;
 
-import com.tm.cspirit.util.Location;
 import com.tm.cspirit.util.UnitChatMessage;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
+public abstract class TileEntityBase extends BlockEntity {
 
-public abstract class TileEntityBase extends TileEntity implements ITickableTileEntity {
+public abstract class TileEntityBase extends BlockEntity {
 
-    public TileEntityBase (final TileEntityType<?> tileEntityType) {
-        super(tileEntityType);
+    public TileEntityBase(final BlockEntityType<?> tileEntityType, final BlockPos pos, final BlockState state) {
+        super(tileEntityType, pos, state);
     }
 
-    public abstract UnitChatMessage getUnitName (PlayerEntity player);
+    public abstract UnitChatMessage getUnitName(Player player);
 
-    @Override
-    public void tick () {
+    public void tick() {
 
     }
 
-    public Location getLocation () {
-        return new Location(world, pos);
-    }
+    public void markForUpdate() {
 
-    public void markForUpdate () {
-
-        if (world != null) {
-            markDirty();
-            world.markAndNotifyBlock(getPos(), world.getChunkAt(getPos()), getBlockState(), getBlockState(), 0, 1);
-            world.addBlockEvent(getPos(), getBlockState().getBlock(), 1, 1);
-            world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 0);
-            world.notifyNeighborsOfStateChange(getPos(), getBlockState().getBlock());
+        if (level != null) {
+            setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            level.blockEntityChanged(worldPosition);
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         }
     }
 
     @Override
-    public void onDataPacket (NetworkManager net, SUpdateTileEntityPacket pkt) {
-        read(getBlockState(), pkt.getNbtCompound());
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        if (pkt.getTag() != null) {
+            handleUpdateTag(pkt.getTag());
+        }
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        read(state, tag);
+    public void handleUpdateTag(CompoundTag tag) {
+        load(tag);
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    protected void saveAdditional(CompoundTag nbt) {
+        super.saveAdditional(nbt);
     }
 
     @Override
-    public CompoundNBT write (CompoundNBT nbt) {
-        return super.write(nbt);
-    }
-
-    @Nullable
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket () {
-        CompoundNBT nbtTagCompound = new CompoundNBT();
-        write(nbtTagCompound);
-        int tileEntityType = 64;
-        return new SUpdateTileEntityPacket(getPos(), tileEntityType, nbtTagCompound);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
     }
 
     @Override
-    public CompoundNBT getUpdateTag () {
-        CompoundNBT nbt = new CompoundNBT();
-        write(nbt);
-        return nbt;
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public CompoundNBT getTileData () {
-        CompoundNBT nbt = new CompoundNBT();
-        write(nbt);
+    public CompoundTag getUpdateTag() {
+        CompoundTag nbt = new CompoundTag();
+        saveAdditional(nbt);
         return nbt;
     }
 }

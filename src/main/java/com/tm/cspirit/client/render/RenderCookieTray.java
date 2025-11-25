@@ -1,28 +1,24 @@
 package com.tm.cspirit.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.tm.cspirit.tileentity.TileEntityCookieTray;
 import com.tm.cspirit.tileentity.base.CSItemHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
-@OnlyIn(Dist.CLIENT)
-public class RenderCookieTray extends TileEntityRenderer<TileEntityCookieTray> {
+public class RenderCookieTray implements BlockEntityRenderer<TileEntityCookieTray> {
 
-    public RenderCookieTray (TileEntityRendererDispatcher dispatcher) {
-        super(dispatcher);
+    public RenderCookieTray(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render (TileEntityCookieTray tileEntity, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
+    public void render (TileEntityCookieTray tileEntity, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
 
         CSItemHandler inv = tileEntity.getInventory();
 
@@ -39,13 +35,13 @@ public class RenderCookieTray extends TileEntityRenderer<TileEntityCookieTray> {
         }
     }
 
-    private void renderItem (ItemStack stack, float x, float y, float z, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight) {
+    private void renderItem (ItemStack stack, float x, float y, float z, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight) {
 
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.scale(0.7F, 0.7F, 0.7F);
         matrixStack.translate(x, y, z);
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(90));
-        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.GROUND, combinedLight, OverlayTexture.NO_OVERLAY, matrixStack, buffer);
-        matrixStack.pop();
+        matrixStack.mulPose(Axis.XP.rotationDegrees(90));
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemDisplayContext.GROUND, combinedLight, OverlayTexture.NO_OVERLAY, matrixStack, buffer, null, 0);
+        matrixStack.popPose();
     }
 }
