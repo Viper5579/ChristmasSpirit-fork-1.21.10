@@ -1,24 +1,23 @@
 package com.tm.cspirit.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.tm.cspirit.client.gui.base.ContainerScreenBase;
 import com.tm.cspirit.inventory.ContainerPresentUnwrapped;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 public class ScreenCookieTray extends ContainerScreenBase<ContainerPresentUnwrapped> {
 
-    public ScreenCookieTray(Container container, PlayerInventory playerInventory, ITextComponent title) {
+    public ScreenCookieTray(ContainerPresentUnwrapped container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
-        playerInventoryTitleY = 38;
+        inventoryLabelY = 38;
     }
 
     @Override
-    protected void drawGuiBackground(MatrixStack matrixStack, int mouseX, int mouseY) {}
+    protected void drawGuiBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {}
 
     @Override
-    protected void drawGuiForeground(MatrixStack matrixStack, int mouseX, int mouseY) {}
+    protected void drawGuiForeground(GuiGraphics guiGraphics, int mouseX, int mouseY) {}
 
     @Override
     protected String getGuiTextureName() {

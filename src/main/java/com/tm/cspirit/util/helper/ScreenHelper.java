@@ -1,9 +1,9 @@
 package com.tm.cspirit.util.helper;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tm.cspirit.main.CSReference;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -21,11 +21,11 @@ public class ScreenHelper {
     private static final Minecraft mc = Minecraft.getInstance();
 
     public static void bindGuiTextures () {
-        mc.getTextureManager().bindTexture(CSReference.GUI_TEXTURES);
+        mc.getTextureManager().bind(CSReference.GUI_TEXTURES);
     }
 
     public static void bindTexture (String name) {
-        mc.getTextureManager().bindTexture(new ResourceLocation(CSReference.MOD_ID + ":textures/gui/" + name + ".png"));
+        mc.getTextureManager().bind(new ResourceLocation(CSReference.MOD_ID + ":textures/gui/" + name + ".png"));
     }
 
     public static void drawCappedRect (int x, int y, int u, int v, int zLevel, int width, int height, int maxWidth, int maxHeight) {
@@ -74,11 +74,11 @@ public class ScreenHelper {
         GL11.glPopMatrix();
     }
 
-    public static void drawCenteredString (MatrixStack matrix, String text, int x, int y, int zLevel, int color) {
+    public static void drawCenteredString (GuiGraphics guiGraphics, String text, int x, int y, int zLevel, int color) {
 
         GL11.glPushMatrix();
         GL11.glTranslatef(0, 0, 50 + zLevel);
-        mc.fontRenderer.drawString(matrix, text, x - (float) (mc.fontRenderer.getStringWidth(text) / 2), y, color);
+        guiGraphics.drawString(mc.font, text, x - (float) (mc.font.width(text) / 2), y, color, false);
         GL11.glPopMatrix();
     }
 
