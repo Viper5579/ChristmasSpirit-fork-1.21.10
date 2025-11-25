@@ -3,20 +3,21 @@ package com.tm.cspirit.tileentity;
 import com.tm.cspirit.init.InitTileEntityTypes;
 import com.tm.cspirit.inventory.ContainerCookieTray;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityCookieTray extends TileEntityInventoryBase {
 
-    public TileEntityCookieTray() {
-        super(InitTileEntityTypes.COOKIE_TRAY.get());
+    public TileEntityCookieTray(BlockPos pos, BlockState state) {
+        super(InitTileEntityTypes.COOKIE_TRAY.get(), pos, state);
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent("Cookie Tray");
+    public Component getDisplayName() {
+        return Component.literal("Cookie Tray");
     }
 
     @Override
@@ -25,7 +26,7 @@ public class TileEntityCookieTray extends TileEntityInventoryBase {
     }
 
     @Override
-    public Container getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer(int windowId, Inventory playerInv) {
         return new ContainerCookieTray(windowId, playerInv, this);
     }
 }
