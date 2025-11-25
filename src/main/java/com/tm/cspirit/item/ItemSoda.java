@@ -3,18 +3,16 @@ package com.tm.cspirit.item;
 import com.tm.cspirit.init.InitSounds;
 import com.tm.cspirit.item.base.ItemFoodBase;
 import com.tm.cspirit.util.helper.ItemHelper;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -25,45 +23,42 @@ public class ItemSoda extends ItemFoodBase {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(new StringTextComponent(isOpened(stack) ? "Opened" : "Unopened"));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        tooltip.add(Component.literal(isOpened(stack) ? "Opened" : "Unopened"));
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick (World world, PlayerEntity player, Hand hand) {
-        player.setActiveHand(hand);
-        return new ActionResult<>(ActionResultType.PASS, player.getHeldItem(hand));
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        player.startUsingItem(hand);
+        return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-
+    public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
         if (!isOpened(stack)) {
-
-            CompoundNBT nbt = ItemHelper.getNBT(stack);
+            CompoundTag nbt = ItemHelper.getNBT(stack);
             nbt.putBoolean("Opened", true);
 
             entityLiving.playSound(InitSounds.CAN_OPEN.get(), 1, 1);
-
             return stack;
         }
 
-        return super.onItemUseFinish(stack, worldIn, entityLiving);
+        return super.finishUsingItem(stack, worldIn, entityLiving);
     }
 
     private boolean isOpened(ItemStack stack) {
-        CompoundNBT nbt = ItemHelper.getNBT(stack);
+        CompoundTag nbt = ItemHelper.getNBT(stack);
         return nbt.getBoolean("Opened");
     }
 
     @Override
-    public UseAction getUseAction (ItemStack stack) {
-        return isOpened(stack) ? UseAction.DRINK : UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return isOpened(stack) ? UseAnim.DRINK : UseAnim.BOW;
     }
 
     @Override
-    public int getUseDuration (ItemStack stack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return isOpened(stack) ? 40 : 20;
     }
 }
