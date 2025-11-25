@@ -4,85 +4,88 @@ import com.tm.cspirit.init.InitEntityTypes;
 import com.tm.cspirit.main.CSConfig;
 import com.tm.cspirit.main.ChristmasSpirit;
 import com.tm.cspirit.packet.PacketReindeerJump;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.IFlyingAnimal;
-import net.minecraft.entity.passive.horse.AbstractHorseEntity;
-import net.minecraft.entity.passive.horse.HorseEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkHooks;
 
-public class EntityReindeer extends HorseEntity implements IFlyingAnimal {
+import javax.annotation.Nullable;
 
-    public static final DataParameter<Boolean> JUMP_KEY = EntityDataManager.createKey(EntityReindeer.class, DataSerializers.BOOLEAN);
+public class EntityReindeer extends Horse implements FlyingAnimal {
 
-    public EntityReindeer(EntityType<? extends HorseEntity> type, World worldIn) {
+    public static final EntityDataAccessor<Boolean> JUMP_KEY = SynchedEntityData.defineId(EntityReindeer.class, EntityDataSerializers.BOOLEAN);
+
+    public EntityReindeer(EntityType<? extends Horse> type, Level worldIn) {
         super(type, worldIn);
     }
 
-    public EntityReindeer(World world, double x, double y, double z) {
+    public EntityReindeer(Level world, double x, double y, double z) {
         this(InitEntityTypes.REINDEER.get(), world);
-        this.setPosition(x, y, z);
-        this.setMotion(Vector3d.ZERO);
-        this.prevPosX = x;
-        this.prevPosY = y;
-        this.prevPosZ = z;
+        this.setPos(x, y, z);
+        this.setDeltaMovement(Vec3.ZERO);
+        this.xOld = x;
+        this.yOld = y;
+        this.zOld = z;
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.func_233666_p_()
-                .createMutableAttribute(Attributes.MAX_HEALTH, 20D)
-                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 1.2D)
-                .createMutableAttribute(Attributes.HORSE_JUMP_STRENGTH, 1);
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 20D)
+                .add(Attributes.MOVEMENT_SPEED, 1.2D)
+                .add(Attributes.JUMP_STRENGTH, 1);
     }
 
     @Override
     public void tick() {
-        
+
         if (CSConfig.misc.reindeerFlying.get()) {
 
-            addPotionEffect(new EffectInstance(Effects.SLOW_FALLING, 20, 0, true, false));
-            
-            if (world.isRemote) {
+            addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20, 0, true, false));
+
+            if (level().isClientSide) {
 
                 if (getControllingPassenger() != null) {
 
-                    if (getControllingPassenger() instanceof ClientPlayerEntity) {
+                    if (getControllingPassenger() instanceof LocalPlayer) {
 
-                        ClientPlayerEntity player = (ClientPlayerEntity) getControllingPassenger();
+                        LocalPlayer player = (LocalPlayer) getControllingPassenger();
 
-                        if (isHorseSaddled()) {
+                        if (isSaddled()) {
 
-                            if (player.movementInput.jump && !dataManager.get(JUMP_KEY)) {
+                            if (player.input.jumping && !entityData.get(JUMP_KEY)) {
                                 ChristmasSpirit.network.sendToServer(new PacketReindeerJump(true));
-                                dataManager.set(JUMP_KEY, true);
+                                entityData.set(JUMP_KEY, true);
                             }
 
-                            else if (dataManager.get(JUMP_KEY)) {
+                            else if (entityData.get(JUMP_KEY)) {
                                 ChristmasSpirit.network.sendToServer(new PacketReindeerJump(false));
-                                dataManager.set(JUMP_KEY, false);
+                                entityData.set(JUMP_KEY, false);
                             }
                         }
                     }
                 }
 
-                else if (dataManager.get(JUMP_KEY)) {
+                else if (entityData.get(JUMP_KEY)) {
                     ChristmasSpirit.network.sendToServer(new PacketReindeerJump(false));
-                    dataManager.set(JUMP_KEY, false);
+                    entityData.set(JUMP_KEY, false);
                 }
             }
 
@@ -90,14 +93,14 @@ public class EntityReindeer extends HorseEntity implements IFlyingAnimal {
 
                 if (getControllingPassenger() == null) {
 
-                    if (dataManager.get(JUMP_KEY)) {
-                        dataManager.set(JUMP_KEY, false);
+                    if (entityData.get(JUMP_KEY)) {
+                        entityData.set(JUMP_KEY, false);
                     }
                 }
             }
 
-            if (dataManager.get(JUMP_KEY)) {
-                addVelocity(0, 0.2F, 0);
+            if (entityData.get(JUMP_KEY)) {
+                push(0, 0.2F, 0);
             }
         }
 
@@ -105,38 +108,39 @@ public class EntityReindeer extends HorseEntity implements IFlyingAnimal {
     }
 
     @Override
-    public void travel(Vector3d travelVector) {
+    public void travel(Vec3 travelVector) {
 
         if (CSConfig.misc.reindeerFlying.get()) {
 
-            if (!onGround) {
-                setAIMoveSpeed((float) getAttributeValue(Attributes.MOVEMENT_SPEED) * 5);
-            } 
-            
-            else setAIMoveSpeed((float) getAttributeValue(Attributes.MOVEMENT_SPEED));
+            if (!onGround()) {
+                setSpeed((float) getAttributeValue(Attributes.MOVEMENT_SPEED) * 5);
+            }
+
+            else setSpeed((float) getAttributeValue(Attributes.MOVEMENT_SPEED));
         }
-        
+
         super.travel(travelVector);
     }
 
     @Override
-    public boolean onLivingFall(float distance, float damageMultiplier) {
+    public boolean causeFallDamage(float distance, float damageMultiplier, net.minecraft.world.damagesource.DamageSource source) {
 
         if (CSConfig.misc.reindeerFlying.get()) {
 
             if (distance > 1.0F) {
-                playSound(SoundEvents.ENTITY_HORSE_LAND, 0.4F, 1.0F);
+                playSound(SoundEvents.HORSE_LAND, 0.4F, 1.0F);
             }
 
             return false;
         }
 
-        else return super.onLivingFall(distance, damageMultiplier);
+        else return super.causeFallDamage(distance, damageMultiplier, source);
     }
 
     @Override
-    public AgeableEntity func_241840_a(ServerWorld world, AgeableEntity mate) {
-        AbstractHorseEntity reindeer = InitEntityTypes.REINDEER.get().create(world);
+    @Nullable
+    public AgeableMob getBreedOffspring(ServerLevel world, AgeableMob mate) {
+        AbstractHorse reindeer = InitEntityTypes.REINDEER.get().create(world);
         setOffspringAttributes(mate, reindeer);
         return reindeer;
     }
@@ -152,26 +156,31 @@ public class EntityReindeer extends HorseEntity implements IFlyingAnimal {
     }
 
     @Override
-    protected void registerData() {
-        super.registerData();
-        dataManager.register(JUMP_KEY, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(JUMP_KEY, false);
     }
 
     @Override
-    public void readAdditional(CompoundNBT nbt) {
-        super.readAdditional(nbt);
-        dataManager.set(JUMP_KEY, nbt.getBoolean("Jump"));
+    public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
+        entityData.set(JUMP_KEY, nbt.getBoolean("Jump"));
     }
 
     @Override
-    public void writeAdditional(CompoundNBT nbt) {
-        super.writeAdditional(nbt);
-        nbt.putBoolean("Jump", dataManager.get(JUMP_KEY));
+    public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
+        nbt.putBoolean("Jump", entityData.get(JUMP_KEY));
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    @Override
+    public boolean isFlying() {
+        return !onGround();
     }
 }
 
