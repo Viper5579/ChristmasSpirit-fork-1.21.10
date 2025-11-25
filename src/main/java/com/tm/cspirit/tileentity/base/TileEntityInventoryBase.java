@@ -3,16 +3,14 @@ package com.tm.cspirit.tileentity.base;
 import com.tm.cspirit.util.UnitChatMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.PlayerInventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.MenuProvider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ContainerHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -35,20 +33,20 @@ public abstract class TileEntityInventoryBase extends TileEntityBase implements 
     }
 
     public abstract int getSizeInventory();
-    public abstract AbstractContainerMenu getTileContainer(int id, PlayerInventory playerInv);
+    public abstract AbstractContainerMenu getTileContainer(int id, Inventory playerInv);
 
     public CSItemHandler getInventory() {
         return this.inventory;
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability (Capability<T> cap, Direction side) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> this.inventory));
     }
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int id, PlayerInventory playerInv, Player player) {
+    public AbstractContainerMenu createMenu(int id, Inventory playerInv, Player player) {
         return getTileContainer(id, playerInv);
     }
 
@@ -56,15 +54,13 @@ public abstract class TileEntityInventoryBase extends TileEntityBase implements 
     public void load(CompoundTag nbt) {
         super.load(nbt);
 
-        NonNullList<ItemStack> inv = NonNullList.withSize(this.inventory.getSlots(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, inv);
-        this.inventory.setNonNullList(inv);
+        this.inventory.deserializeNBT(nbt);
     }
 
     @Override
     protected void saveAdditional(CompoundTag nbt) {
 
-        ContainerHelper.saveAllItems(nbt, this.inventory.toNonNullList());
+        nbt.merge(this.inventory.serializeNBT());
         super.saveAdditional(nbt);
     }
 }

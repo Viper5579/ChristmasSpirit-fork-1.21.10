@@ -5,17 +5,17 @@ import com.tm.cspirit.inventory.ContainerPresentWrapped;
 import com.tm.cspirit.present.PresentConstructor;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.network.chat.Component;
 
 public class TileEntityPresentWrapped extends TileEntityInventoryBase {
 
     private PresentConstructor presentConstructor;
 
-    public TileEntityPresentWrapped (BlockPos pos, BlockState state) {
+    public TileEntityPresentWrapped(BlockPos pos, BlockState state) {
         super(InitTileEntityTypes.PRESENT_WRAPPED.get(), pos, state);
         presentConstructor = new PresentConstructor();
     }
@@ -44,7 +44,7 @@ public class TileEntityPresentWrapped extends TileEntityInventoryBase {
     }
 
     @Override
-    public AbstractContainerMenu getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer(int windowId, Inventory playerInv) {
         return new ContainerPresentWrapped(windowId, playerInv, this);
     }
 

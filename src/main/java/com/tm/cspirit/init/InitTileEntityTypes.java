@@ -14,16 +14,16 @@ public class InitTileEntityTypes {
     public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, CSReference.MOD_ID);
 
     public static final RegistryObject<BlockEntityType<TileEntityPresentUnwrapped>> PRESENT_UNWRAPPED = TILE_ENTITY_TYPES.register(
-            "present_unwrapped", () -> BlockEntityType.Builder.of(TileEntityPresentUnwrapped::new, InitBlocks.PRESENT_UNWRAPPED.get()).build(null));
+            "present_unwrapped", () -> BlockEntityType.Builder.of(TileEntityPresentUnwrapped::new, InitItems.PRESENT_UNWRAPPED.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<TileEntityPresentWrapped>> PRESENT_WRAPPED = TILE_ENTITY_TYPES.register(
             "present_wrapped", () -> BlockEntityType.Builder.of(TileEntityPresentWrapped::new,
-                    InitBlocks.PRESENT_WRAPPED_RED.get(),
-                    InitBlocks.PRESENT_WRAPPED_GREEN.get(),
-                    InitBlocks.PRESENT_WRAPPED_BLUE.get(),
-                    InitBlocks.PRESENT_WRAPPED_ORANGE.get(),
-                    InitBlocks.PRESENT_WRAPPED_PINK.get()).build(null));
+                    InitItems.PRESENT_WRAPPED_RED.get(),
+                    InitItems.PRESENT_WRAPPED_GREEN.get(),
+                    InitItems.PRESENT_WRAPPED_BLUE.get(),
+                    InitItems.PRESENT_WRAPPED_ORANGE.get(),
+                    InitItems.PRESENT_WRAPPED_PINK.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<TileEntityCookieTray>> COOKIE_TRAY = TILE_ENTITY_TYPES.register(
-            "cookie_tray", () -> BlockEntityType.Builder.of(TileEntityCookieTray::new, InitBlocks.COOKIE_TRAY.get()).build(null));
+            "cookie_tray", () -> BlockEntityType.Builder.of(TileEntityCookieTray::new, InitItems.COOKIE_TRAY.get()).build(null));
 }

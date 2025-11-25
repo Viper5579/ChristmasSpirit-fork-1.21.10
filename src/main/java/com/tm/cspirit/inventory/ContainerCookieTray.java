@@ -24,9 +24,8 @@ public class ContainerCookieTray extends ContainerBase {
     }
 
     @Override
-    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
+    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+        super.clicked(slotId, dragType, clickTypeIn, player);
         tileEntity.markForUpdate();
-        return stack;
     }
 }

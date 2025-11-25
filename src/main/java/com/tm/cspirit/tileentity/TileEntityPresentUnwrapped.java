@@ -5,13 +5,13 @@ import com.tm.cspirit.inventory.ContainerPresentUnwrapped;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityPresentUnwrapped extends TileEntityInventoryBase {
 
-    public TileEntityPresentUnwrapped (BlockPos pos, BlockState state) {
+    public TileEntityPresentUnwrapped(BlockPos pos, BlockState state) {
         super(InitTileEntityTypes.PRESENT_UNWRAPPED.get(), pos, state);
     }
 
@@ -31,7 +31,7 @@ public class TileEntityPresentUnwrapped extends TileEntityInventoryBase {
     }
 
     @Override
-    public AbstractContainerMenu getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer(int windowId, Inventory playerInv) {
         return new ContainerPresentUnwrapped(windowId, playerInv, this);
     }
 }

@@ -4,10 +4,10 @@ import com.tm.cspirit.init.InitTileEntityTypes;
 import com.tm.cspirit.inventory.ContainerCookieTray;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.PlayerInventory;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.network.chat.Component;
 
 public class TileEntityCookieTray extends TileEntityInventoryBase {
 
@@ -26,7 +26,7 @@ public class TileEntityCookieTray extends TileEntityInventoryBase {
     }
 
     @Override
-    public AbstractContainerMenu getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer(int windowId, Inventory playerInv) {
         return new ContainerCookieTray(windowId, playerInv, this);
     }
 }

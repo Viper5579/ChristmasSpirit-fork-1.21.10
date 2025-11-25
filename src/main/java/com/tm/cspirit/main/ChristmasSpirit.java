@@ -15,30 +15,29 @@ import com.tm.cspirit.event.SpawnEggRegisterEvent;
 import com.tm.cspirit.init.*;
 import com.tm.cspirit.packet.PacketReindeerJump;
 import com.tm.cspirit.packet.PacketWrapPresent;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 @Mod(CSReference.MOD_ID)
-@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ChristmasSpirit {
+
+    private static final String PROTOCOL_VERSION = "1";
 
     public static ChristmasSpirit instance;
 
@@ -51,11 +50,12 @@ public class ChristmasSpirit {
 
         MOD_EVENT_BUS = FMLJavaModLoadingContext.get().getModEventBus();
         MOD_EVENT_BUS.addListener(this::onCommonSetup);
-        MOD_EVENT_BUS.addListener(this::onClientSetup);
+        MOD_EVENT_BUS.addListener(this::onEntityAttributeCreation);
         MOD_EVENT_BUS.addListener(this::onLoadComplete);
+        MOD_EVENT_BUS.addListener(this::onEntityAttributeCreation);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CSConfig.spec, CSReference.CONFIG_DIR + "/ChristmasSpirit.toml");
-        DataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
+        EntityDataSerializers.registerSerializer(CSDataSerializers.ITEMSTACK_ARRAY_4);
         InitArmorMaterials.ARMOR_MATERIALS.register(MOD_EVENT_BUS);
         InitSounds.SOUNDS.register(MOD_EVENT_BUS);
         InitEffects.POTION_TYPES.register(MOD_EVENT_BUS);
@@ -71,42 +71,47 @@ public class ChristmasSpirit {
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
 
-        network = NetworkRegistry.newSimpleChannel(new ResourceLocation(CSReference.MOD_ID, CSReference.MOD_ID), () -> "1.0", s -> true, s -> true);
+        network = NetworkRegistry.newSimpleChannel(new ResourceLocation(CSReference.MOD_ID, CSReference.MOD_ID), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
         network.registerMessage(0, PacketWrapPresent.class, PacketWrapPresent::toBytes, PacketWrapPresent::new, PacketWrapPresent::handle);
         network.registerMessage(1, PacketReindeerJump.class, PacketReindeerJump::toBytes, PacketReindeerJump::new, PacketReindeerJump::handle);
 
         InitEvents.init();
-
-        DeferredWorkQueue.runLater(() -> {
-            GlobalEntityTypeAttributes.put(InitEntityTypes.JACK_FROST.get(), EntityJackFrost.setCustomAttributes().create());
-            GlobalEntityTypeAttributes.put(InitEntityTypes.REINDEER.get(), EntityReindeer.setCustomAttributes().create());
-        });
     }
 
-    private void onClientSetup(final FMLClientSetupEvent event) {
-        InitRenderLayers.init();
-
-        ScreenManager.registerFactory(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
-        ScreenManager.registerFactory(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
-
-        RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.JACK_FROST.get(), RenderJackFrost::new);
-        RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.REINDEER.get(), RenderReindeer::new);
-        RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.CANDY_CANE_PROJECTILE.get(), RenderCandyCaneProjectile::new);
-        RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.SLEIGH.get(), RenderSleigh::new);
-        RenderingRegistry.registerEntityRenderingHandler(InitEntityTypes.CHRISTMAS_TREE.get(), RenderChristmasTree::new);
-
-        BlockEntityRenderers.register(InitTileEntityTypes.COOKIE_TRAY.get(), RenderCookieTray::new);
-
-        MinecraftForge.EVENT_BUS.register(new SpawnEggRegisterEvent());
-        MinecraftForge.EVENT_BUS.register(new ItemTooltipOverrideEvent());
+    private void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
+        event.put(InitEntityTypes.JACK_FROST.get(), EntityJackFrost.setCustomAttributes().create());
+        event.put(InitEntityTypes.REINDEER.get(), EntityReindeer.setCustomAttributes().create());
     }
 
     private void onLoadComplete(final FMLLoadCompleteEvent event) {
-        InitFreezeWorld.init();
+        event.enqueueWork(InitFreezeWorld::init);
     }
 
-    @SubscribeEvent
-    public void onServerStarting (FMLServerStartingEvent event) {
-        CSCommandBase.register(event.getServer().getFunctionManager().getCommandDispatcher());
+        MenuScreens.register(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
+        MenuScreens.register(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
+
+    @Mod.EventBusSubscriber(modid = CSReference.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientModEvents {
+
+        @SubscribeEvent
+        public static void onClientSetup(final FMLClientSetupEvent event) {
+            InitRenderLayers.init();
+
+            event.enqueueWork(() -> {
+                MenuScreens.register(InitContainerTypes.PRESENT_UNWRAPPED.get(), ScreenPresentUnwrapped::new);
+                MenuScreens.register(InitContainerTypes.COOKIE_TRAY.get(), ScreenCookieTray::new);
+
+                EntityRenderers.register(InitEntityTypes.JACK_FROST.get(), RenderJackFrost::new);
+                EntityRenderers.register(InitEntityTypes.REINDEER.get(), RenderReindeer::new);
+                EntityRenderers.register(InitEntityTypes.CANDY_CANE_PROJECTILE.get(), RenderCandyCaneProjectile::new);
+                EntityRenderers.register(InitEntityTypes.SLEIGH.get(), RenderSleigh::new);
+                EntityRenderers.register(InitEntityTypes.CHRISTMAS_TREE.get(), RenderChristmasTree::new);
+
+                BlockEntityRenderers.register(InitTileEntityTypes.COOKIE_TRAY.get(), RenderCookieTray::new);
+            });
+
+            MinecraftForge.EVENT_BUS.register(new SpawnEggRegisterEvent());
+            MinecraftForge.EVENT_BUS.register(new ItemTooltipOverrideEvent());
+        }
     }
 }
