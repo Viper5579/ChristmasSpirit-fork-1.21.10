@@ -3,7 +3,6 @@ package com.tm.cspirit.init;
 import com.tm.cspirit.main.CSConfig;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeAmbience;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -12,8 +11,8 @@ public class InitFreezeWorld {
     public static void init() {
 
         if (CSConfig.worldGen.freezeWorld.get()) {
-            DeferredWorkQueue.runLater(() -> freezeBiomes("field_242423_j", "field_242526_h", "field_235052_p_"));
-            DeferredWorkQueue.runLater(() -> freezeBiomes("climate", "grassColorModifier", "effects"));
+            freezeBiomes("field_242423_j", "field_242526_h", "field_235052_p_");
+            freezeBiomes("climate", "grassColorModifier", "effects");
         }
     }
 

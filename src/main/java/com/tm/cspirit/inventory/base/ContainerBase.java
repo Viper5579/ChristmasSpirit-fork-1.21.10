@@ -3,6 +3,7 @@ package com.tm.cspirit.inventory.base;
 import com.tm.cspirit.tileentity.base.CSItemHandler;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -22,7 +23,7 @@ public class ContainerBase extends AbstractContainerMenu {
 
     protected boolean isItemContainer;
 
-    protected ContainerBase(MenuType<?> type, int windowId, Inventory playerInventory, TileEntityInventoryBase tileEntity, int x, int y) {
+    protected ContainerBase (MenuType<?> type, int windowId, Inventory playerInventory, TileEntityInventoryBase tileEntity, int x, int y) {
         super(type, windowId);
 
         this.playerInventory = playerInventory;
@@ -36,7 +37,7 @@ public class ContainerBase extends AbstractContainerMenu {
      * Gets the connected TileEntity.
      * Throws IllegalStateException if not found.
      */
-    protected static TileEntityInventoryBase getTileEntity(final Inventory playerInventory, final FriendlyByteBuf data) {
+    protected static TileEntityInventoryBase getTileEntity (final Inventory playerInventory, final FriendlyByteBuf data) {
 
         Objects.requireNonNull(playerInventory, "playerInventory cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
@@ -74,7 +75,7 @@ public class ContainerBase extends AbstractContainerMenu {
     /**
      * Used to by addPlayerInv & addPlayerHotbar to add the appropriate slots.
      */
-    private void addStorageInv(Inventory inv, int idOffset, int x, int y, int height) {
+    private void addStorageInv (Container inv, int idOffset, int x, int y, int height) {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < 9; j++) {
@@ -101,70 +102,8 @@ public class ContainerBase extends AbstractContainerMenu {
      * Handles shift-clicking items from slot to slot.
      */
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int index) {
-
-        ItemStack itemstack = ItemStack.EMPTY;
-        /*Slot slot = this.inventorySlots.get(index);
-
-        //Checks if the slot exists and it has an Item in it.
-        if (slot != null && slot.getHasStack()) {
-
-            ItemStack itemStack1 = slot.getStack();
-            itemstack = itemStack1.copy();
-
-            //Checks if the new inventory has slots.
-            if (getTileEntitySlotAmount() > 0) {
-
-                //Transfers: Player's inventory -> New inventory.
-                if (index <= 35) {
-
-                    System.out.println(itemStack1.getCount());
-                    System.out.println(slot);
-
-                    if (itemStack1.getCount() > slot.getItemStackLimit(itemStack1)) {
-                        return ItemStack.EMPTY;
-                    }
-
-                    if (mergeIfPossible(slot, itemStack1, itemstack, 36, 36 + getTileEntitySlotAmount())) {
-
-                        if (mergeInvHotbarIfPossible(slot, itemStack1, itemstack, index)) {
-                            return ItemStack.EMPTY;
-                        }
-                    }
-                }
-
-                //Transfers: New inventory -> Player's inventory.
-                else {
-
-                    if (mergeIfPossible(slot, itemStack1, itemstack, 0, 35)) {
-                        return ItemStack.EMPTY;
-                    }
-
-                    slot.onSlotChange(itemStack1, itemstack);
-                }
-            }
-
-            else {
-
-                if (mergeInvHotbarIfPossible(slot, itemStack1, itemstack, index)) {
-                    return ItemStack.EMPTY;
-                }
-            }
-
-            if (itemStack1.getCount() == 0) {
-                slot.putStack(ItemStack.EMPTY);
-            }
-
-            else slot.onSlotChanged();
-
-            if (itemStack1.getCount() == itemstack.getCount()) {
-                return ItemStack.EMPTY;
-            }
-
-            slot.onTake(playerInventory.player, itemStack1);
-        }*/
-
-        return itemstack;
+    public ItemStack quickMoveStack(Player player, int index) {
+        return ItemStack.EMPTY;
     }
 
     /**
@@ -176,7 +115,7 @@ public class ContainerBase extends AbstractContainerMenu {
             return true;
         }
 
-        slot.onSlotChange(is, is2);
+        slot.onQuickCraft(is, is2);
         return false;
     }
 
@@ -206,7 +145,7 @@ public class ContainerBase extends AbstractContainerMenu {
     }
 
     @Override
-    public boolean stillValid(Player playerIn) {
+    public boolean stillValid (Player playerIn) {
         return true;
     }
 }

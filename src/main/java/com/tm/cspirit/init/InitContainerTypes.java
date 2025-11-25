@@ -6,6 +6,7 @@ import com.tm.cspirit.inventory.ContainerPresentWrapped;
 import com.tm.cspirit.main.CSReference;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
