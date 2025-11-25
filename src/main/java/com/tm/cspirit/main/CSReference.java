@@ -1,6 +1,6 @@
 package com.tm.cspirit.main;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public class CSReference {
