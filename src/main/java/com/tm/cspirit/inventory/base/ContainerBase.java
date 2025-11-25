@@ -140,7 +140,7 @@ public class ContainerBase extends AbstractContainerMenu {
             }
         }
 
-        slot.onSlotChange(is, is2);
+        slot.onQuickCraft(is, is2);
         return false;
     }
 
@@ -149,4 +149,3 @@ public class ContainerBase extends AbstractContainerMenu {
         return true;
     }
 }
-

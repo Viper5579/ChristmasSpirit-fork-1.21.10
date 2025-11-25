@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
+public abstract class TileEntityBase extends BlockEntity {
 
 public abstract class TileEntityBase extends BlockEntity {
 
@@ -56,7 +56,6 @@ public abstract class TileEntityBase extends BlockEntity {
         super.load(nbt);
     }
 
-    @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
