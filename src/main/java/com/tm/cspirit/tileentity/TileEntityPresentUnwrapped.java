@@ -3,20 +3,21 @@ package com.tm.cspirit.tileentity;
 import com.tm.cspirit.init.InitTileEntityTypes;
 import com.tm.cspirit.inventory.ContainerPresentUnwrapped;
 import com.tm.cspirit.tileentity.base.TileEntityInventoryBase;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityPresentUnwrapped extends TileEntityInventoryBase {
 
-    public TileEntityPresentUnwrapped () {
-        super(InitTileEntityTypes.PRESENT_UNWRAPPED.get());
+    public TileEntityPresentUnwrapped(BlockPos pos, BlockState state) {
+        super(InitTileEntityTypes.PRESENT_UNWRAPPED.get(), pos, state);
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent("Unwrapped Present");
+    public Component getDisplayName() {
+        return Component.literal("Unwrapped Present");
     }
 
     @Override
@@ -30,7 +31,7 @@ public class TileEntityPresentUnwrapped extends TileEntityInventoryBase {
     }
 
     @Override
-    public Container getTileContainer (int windowId, PlayerInventory playerInv) {
+    public AbstractContainerMenu getTileContainer(int windowId, Inventory playerInv) {
         return new ContainerPresentUnwrapped(windowId, playerInv, this);
     }
 }
